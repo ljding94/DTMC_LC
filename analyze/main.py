@@ -14,8 +14,8 @@ def main():
     #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd1.0.txt")
     #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd5.0.txt")
     #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd9.0.txt")
-    return 0
-    foldername = "../data/Ne1/Dec11_2020"
+    #return 0
+    foldername = "../data/Ne1/Dec10_2020"
     print("analyzing "+foldername)
     pars = []
     colors = []
@@ -33,8 +33,8 @@ def main():
     lams = np.linspace(4.0,50.0,93)
     lam=5.0
     Kds = np.arange(4.0,8.1,0.5)
-    q=0.15
-    Cns=np.arange(4.0,14.1,2.0)
+    q=0.2
+    Cns=np.arange(4.0,15.1,1.0)
     Cn=0.0
     kargds=np.arange(1.0,10.1,0.5)
     kargd=0.0
@@ -43,7 +43,7 @@ def main():
     for Kd in Kds:
         pars.append([N, Ne, L, kar,lam, Kd, q, Cns, kargd])
     par_nm = ["N", "Ne", "L", "kar","lam","Kd","q", "Cn", "kargd"]
-    par_dg = [0,0,0,0,1,1,2,1,1] # number of digit for each
+    par_dg = [0,0,0,0,1,1,1,1,1] # number of digit for each
     mod="Cn"
     for i in range(len(pars)):
         N, Ne, L, kar,  lam, Kd, q,Cn,kargd = pars[i]
@@ -54,12 +54,12 @@ def main():
             #twistl_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,d0=1.5,head="nunu2lcov",tag=r"$K_d=%.1f$"%Kd,leg_num=4,bin_num=20)
             #twistl_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,d0=1.5,head="nu0nu2l",tag=r"$K_d=%.1f$"%Kd,leg_num=4,bin_num=20)
             pass
-            twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=4,bin_num=40)
+            #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=4,bin_num=40)
 
         for Cn in Cns[::5]:
             if (i%4==0):
-                filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_lam%.1f_Kd%.1f_q%.2f_Cn%.1f_kargd%.1f.txt" % (N, Ne, L, kar,lam,Kd,q,Cn, kargd)
-                config_plot_xyz(filename, tag=r"$K_d=%.1f,q=%.2f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
+                filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kargd%.1f.txt" % (N, Ne, L, kar,lam,Kd,q,Cn, kargd)
+                #config_plot_xyz(filename, tag=r"$K_d=%.1f,q=%.2f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
 
         #print("sleeping...")
         #time.sleep(10)

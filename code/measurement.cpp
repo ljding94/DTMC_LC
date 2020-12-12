@@ -450,7 +450,6 @@ double dtmc_lc::dAK_m(int index)
     {
         K = PI;
         sort_nei(index);
-        // TODO: fix following code for on-edge measurement
     }
 
     for (int j = 0; j < mesh[index].nei.size(); j++)
@@ -464,6 +463,7 @@ double dtmc_lc::dAK_m(int index)
             if (mesh[index].edge_nei.size())
             {
                 break;
+                mesh[index].nei = nei_original;
             }
             ind_k = mesh[index].nei[0];
         }
@@ -680,7 +680,6 @@ std::vector<double> dtmc_lc::Qevec_m(std::vector<int> bead_list)
 
 std::vector<double> dtmc_lc::un2r_m(int bin_num)
 {
-    // TODO: remove del_r, just use bin_num,
     // make the range normalized to 1 using average distance to the edge
     std::vector<double> un2r;
     std::vector<int> Countr;

@@ -282,7 +282,7 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
 
     if(mode=="Cn"):
         Kd=np.array(Kd)
-        cpar_pKd=cpar/np.sqrt(Kd)[:,np.newaxis]
+        cpar_pKd=cpar/Kd[:,np.newaxis]
         O_cpar_plot(axs[0,1],lamp,lamperr,O_label,"lamp",r"$\lambda_p$",cpar_pKd,None,None,ylim=Ylim,Ms=5)
         cpar_pKd_all = cpar_pKd.flatten()
         lamp_all = lamp.flatten()
@@ -300,8 +300,9 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
         axs[1,1].set_yscale("log")
         axs[1,1].set_xlabel(r"$C_n/K_d$")
         # select data for lamp<0.2
-        lp_min=0.25
-        boollamp=lamp_all<lp_min
+        lp_max=0.2
+        lp_min=0.0
+        boollamp=np.logical_and(lp_min<lamp_all,lamp_all<lp_max)
         cpar_pKd_select=cpar_pKd_all[boollamp]
         lamp_select=lamp_all[boollamp]
         lamperr_select=lamperr_all[boollamp]
@@ -319,7 +320,7 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
 
     elif(mode=="Kd"):
         Cn=np.array(Cn)
-        cpar_pCn=cpar/np.sqrt(Cn)[:,np.newaxis]
+        cpar_pCn=cpar/Cn[:,np.newaxis]
         O_cpar_plot(axs[0,1],lamp,lamperr,O_label,"lamp",r"$\lambda_p$",cpar_pCn,None,None,ylim=Ylim,Ms=5)
         popt,pcov=curve_fit(exp_fit,cpar_pCn.flatten(),lamp.flatten(), sigma=lamperr.flatten())
         popterr = np.diag(pcov)**0.5
