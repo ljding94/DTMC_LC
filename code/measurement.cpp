@@ -82,41 +82,6 @@ int dtmc_lc::sort_nei(int index)
     return 1;
 }
 
-void dtmc_lc::O_reset()
-{
-    E = 0;
-    for (int e = 0; e < Ne; e++)
-    {
-        Les[e] = 0;
-    }
-    IdA = 0;
-    I2H = 0;
-    I2H2 = 0;
-    IK = 0;
-    IKun2 = 0;
-    Tp2uu = 0;
-    Tun2 = 0;
-    for (int i = 0; i < mesh.size(); i++)
-    {
-        mesh[i].n = n_m(i);
-        mesh[i].dAn2H = dAn2H_m(i);
-        mesh[i].ds = ds_m(i);
-        mesh[i].dAK = dAK_m(i);
-        mesh[i].n = n_m(i);
-        Les[mesh[i].edge_num] += mesh[i].ds;
-        IdA += mesh[i].dAn2H[0];
-        I2H += mesh[i].dAn2H[1] * mesh[i].dAn2H[0];
-        I2H2 += mesh[i].dAn2H[1] * mesh[i].dAn2H[1] * mesh[i].dAn2H[0];
-        IK += mesh[i].dAK;
-        Tp2uu += std::pow(innerproduct(mesh[i].u, mesh[i].u), 2);
-        Tun2 += std::pow(innerproduct(mesh[i].u, mesh[i].n), 2);
-    }
-    E += -Kd * Tp2uu - Cn * Tun2;
-
-    std::cout << "after reset\n";
-    std::cout << "E = " << E << "\n";
-}
-
 int dtmc_lc::list_a_nei_b(std::vector<int> a, int b)
 {
     for (int j = 0; j < a.size(); j++)
@@ -234,12 +199,12 @@ void dtmc_lc::Ob_sys_update(observable Ob_new, observable Ob_old)
     }
     Ob_sys.Tp2uu += Ob_new.Tp2uu - Ob_old.Tp2uu;
     Ob_sys.Tuuc += Ob_new.Tuuc - Ob_old.Tuuc;
-    Ob_sys.Tun2 = Ob_new.Tun2 - Ob_old.Tun2;
-    Ob_sys.IKun2 = Ob_new.IKun2 - Ob_old.IKun2;
-    Ob_sys.IdA = Ob_new.IdA - Ob_old.IdA;
-    Ob_sys.I2H = Ob_new.I2H - Ob_old.I2H;
-    Ob_sys.IK = Ob_new.IK - Ob_old.IK;
-    Ob_sys.Bond_num = Ob_new.Bond_num - Ob_old.Bond_num;
+    Ob_sys.Tun2 += Ob_new.Tun2 - Ob_old.Tun2;
+    Ob_sys.IKun2 += Ob_new.IKun2 - Ob_old.IKun2;
+    Ob_sys.IdA += Ob_new.IdA - Ob_old.IdA;
+    Ob_sys.I2H += Ob_new.I2H - Ob_old.I2H;
+    Ob_sys.IK += Ob_new.IK - Ob_old.IK;
+    Ob_sys.Bond_num += Ob_new.Bond_num - Ob_old.Bond_num;
 }
 double dtmc_lc::E_m(observable Ob)
 {
@@ -566,22 +531,6 @@ double dtmc_lc::un2_m(int index)
     return std::pow(innerproduct(mesh[index].u, mesh[index].n), 2);
 }
 
-double dtmc_lc::dEgeo_m(int index)
-{
-    // it this necessary to have such function?
-    double dEgeo_i = 0;
-    double ds_i;
-    if (mesh[index].edge_nei.size() == 0)
-    {
-        dEgeo_i += 0.5 * kar * mesh[index].dAn2H[0] * mesh[index].dAn2H[1] *
-                   mesh[index].dAn2H[1];
-    }
-    else
-    {
-        dEgeo_i += lam * mesh[index].ds;
-    }
-    return dEgeo_i;
-}
 #pragma endregion
 
 #pragma region : membrane structure related

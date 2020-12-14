@@ -15,7 +15,7 @@ def main():
     #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd5.0.txt")
     #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd9.0.txt")
     #return 0
-    foldername = "../data/Ne1/Dec10_2020"
+    foldername = "../data/Ne1/Dec14_2020"
     print("analyzing "+foldername)
     pars = []
     colors = []
@@ -32,23 +32,24 @@ def main():
     kar = 15
     lams = np.linspace(4.0,50.0,93)
     lam=5.0
-    Kds = np.arange(4.0,8.1,0.5)
-    q=0.2
-    Cns=np.arange(4.0,15.1,1.0)
+    Kds = np.arange(4.0,13.1,1.0)
+    Kd=4.0
+    q=0.0
+    Cns=np.arange(2.0,10.1,2.0)
     Cn=0.0
-    kargds=np.arange(1.0,10.1,0.5)
+    kargds=np.arange(0.5,10.1,0.5)
     kargd=0.0
     Ne1pars = []
     Ne2pars = []
-    for Kd in Kds:
-        pars.append([N, Ne, L, kar,lam, Kd, q, Cns, kargd])
+    for Cn in Cns:
+        pars.append([N, Ne, L, kar,lam, Kd, q, Cn, kargds])
     par_nm = ["N", "Ne", "L", "kar","lam","Kd","q", "Cn", "kargd"]
     par_dg = [0,0,0,0,1,1,1,1,1] # number of digit for each
-    mod="Cn"
+    mod="kargd"
     for i in range(len(pars)):
         N, Ne, L, kar,  lam, Kd, q,Cn,kargd = pars[i]
         print(pars[i])
-        #O_stat_ana(foldername,pars[i],par_nm,par_dg, mode=mod, tau_c=6)
+        O_stat_ana(foldername,pars[i],par_nm,par_dg, mode=mod, tau_c=6)
         if(1):
             pass
             #twistl_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,d0=1.5,head="nunu2lcov",tag=r"$K_d=%.1f$"%Kd,leg_num=4,bin_num=20)
@@ -56,10 +57,9 @@ def main():
             pass
             #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=4,bin_num=40)
 
-        for Cn in Cns[::5]:
-            if (i%4==0):
-                filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kargd%.1f.txt" % (N, Ne, L, kar,lam,Kd,q,Cn, kargd)
-                #config_plot_xyz(filename, tag=r"$K_d=%.1f,q=%.2f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
+        for kargd in kargds[::4]:
+            filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kargd%.1f.txt" % (N, Ne, L, kar,lam,Kd,q,Cn, kargd)
+            config_plot_xyz(filename, tag=r"$\kappa=%.0f,C_n=%.1f,\kappa_d=%.1f$" % (kar,Cn,kargd),Format="png")
 
         #print("sleeping...")
         #time.sleep(10)
@@ -67,8 +67,8 @@ def main():
     alphas = None
 
 
-    lamp_pars_plot(foldername, pars,par_nm,par_dg,mode=mod,head="un2r")
-    #Os_pars_plot(foldername, pars,par_nm,par_dg,mode=mod)
+    #lamp_pars_plot(foldername, pars,par_nm,par_dg,mode=mod,head="un2r")
+    Os_pars_plot(foldername, pars,par_nm,par_dg,mode=mod)
 
     # additional test
 

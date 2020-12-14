@@ -240,6 +240,9 @@ def E_parts_cpar_plot(data, para, cpar_label, savename):
     plt.savefig(savename, format="pdf", transparant=True)
     plt.close()
 
+
+def exp_fit(x,a,b):
+    return a*np.power(x,b)
 def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
     xLabel = mode
     Kd_ind = find_cpar_ind(par_nm,"Kd")
@@ -281,38 +284,50 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
     # fit data (exponent) if cpar is Cn
 
     if(mode=="Cn"):
+        None_label=["" for i in range(len(cpar))]
         Kd=np.array(Kd)
         cpar_pKd=cpar/Kd[:,np.newaxis]
-        O_cpar_plot(axs[0,1],lamp,lamperr,O_label,"lamp",r"$\lambda_p$",cpar_pKd,None,None,ylim=Ylim,Ms=5)
+        O_cpar_plot(axs[0,1],np.power(lamp,-2),2*lamperr*np.power(lamp,-3),None_label,"lamp",r"$1/\lambda_p^2$",cpar_pKd,None,None,Ms=5)
         cpar_pKd_all = cpar_pKd.flatten()
         lamp_all = lamp.flatten()
         lamperr_all = lamperr.flatten()
-        popt,pcov=curve_fit(exp_fit,cpar_pKd_all,lamp_all, sigma=lamperr_all)
-        popterr = np.diag(pcov)**0.5
         cpmin=cpar_pKd_all.min()
         cpmax=cpar_pKd_all.max()
         cpar_plt=np.linspace(cpmin,cpmax,100)
+        #TODO: replace poly fit with curve_fit, fint chi2/dof for squared fit
+        pfit = np.polyfit(cpar_pKd_all,np.power(lamp_all,-2),1)
+        print("pfit",pfit)
+        lamp_pfit=np.poly1d(pfit)
+        chi2_dof = np.sum((np.polyval(pfit, cpar_pKd_all) - lamp_all) ** 2/np.polyval(pfit, cpar_pKd_all))
+        print("chi2_dof,",chi2_dof,len(cpar_pKd_all))
+        axs[0,1].plot(cpar_plt,lamp_pfit(cpar_plt),label=r"$1/\lambda_p^2=%.2f(\frac{C_n}{K_d})+%.2f, \chi^2=%.2f$"%(pfit[0],pfit[1],chi2_dof))
+        axs[0,1].legend()
+
+        popt,pcov=curve_fit(exp_fit,cpar_pKd_all,lamp_all, sigma=lamperr_all,p0=[1.0,-0.5])
+        popterr = np.diag(pcov)**0.5
+
         axs[1,1].fill_between(cpar_plt,exp_fit(cpar_plt,*popt-popterr),exp_fit
-        (cpar_plt,*popt+popterr),alpha=0.4,label=r"$\sim (K_d/C_n)^{%.2f\pm%.2f}$"%(-popt[1],popterr[1]))
+        (cpar_plt,*popt+popterr),alpha=0.4,label=r"$\lambda_p=%.2f(C_n/K_d)^{%.2f\pm%.2f}$"%(popt[0],popt[1],popterr[1]))
+        print(popt)
         axs[1,1].legend()
         O_cpar_plot(axs[1,1],lamp,lamperr,O_label,"lamp",r"$\lambda_p$",cpar_pKd,None,None,Ms=5)
         axs[1,1].set_xscale("log")
         axs[1,1].set_yscale("log")
         axs[1,1].set_xlabel(r"$C_n/K_d$")
         # select data for lamp<0.2
-        lp_max=0.2
-        lp_min=0.0
+        lp_max=1.0
+        lp_min=0.15
         boollamp=np.logical_and(lp_min<lamp_all,lamp_all<lp_max)
         cpar_pKd_select=cpar_pKd_all[boollamp]
         lamp_select=lamp_all[boollamp]
         lamperr_select=lamperr_all[boollamp]
-        popt,pcov=curve_fit(exp_fit,cpar_pKd_select,lamp_select, sigma=lamperr_select,p0=[1,-0.5])
+        popt,pcov=curve_fit(exp_fit,cpar_pKd_select,lamp_select, sigma=lamperr_select,p0=[1.0,-0.5])
         print(popt)
         popterr = np.diag(pcov)**0.5
         axs[2,1].fill_between(cpar_plt,exp_fit(cpar_plt,*popt-popterr),exp_fit
-        (cpar_plt,*popt+popterr),alpha=0.4,label=r"$\sim (K_d/C_n)^{%.2f\pm%.2f}$"%(-popt[1],popterr[1]))
+        (cpar_plt,*popt+popterr),alpha=0.4,label=r"$\lambda_p=%.2f(K_d/C_n)^{%.2f\pm%.2f}$"%(popt[0],popt[1],popterr[1]))
         axs[2,1].legend()
-        O_cpar_plot(axs[2,1],[lamp_select],[lamperr_select],[""],"lamp",r"$\lambda_p(<%.1f)$ only"%lp_min,[cpar_pKd_select],None,None,Ms=5)
+        O_cpar_plot(axs[2,1],[lamp_select],[lamperr_select],[""],"lamp",r"$\lambda_p(<%.1f)$ only"%lp_max,[cpar_pKd_select],None,None,Ms=5)
         axs[2,1].set_xscale("log")
         axs[2,1].set_yscale("log")
         axs[2,1].set_xlabel(r"$C_n/K_d$")

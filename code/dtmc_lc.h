@@ -9,7 +9,8 @@
 #include <vector>
 
 // observable
-struct observable {
+struct observable
+{
     // energy
     double E;
     // geometric
@@ -27,7 +28,8 @@ struct observable {
     double IK;    // integral of dA(K)
     int Bond_num; // total number of bonds
 };
-struct vertex {
+struct vertex
+{
     // configuration related
     std::vector<double> R{0, 0, 0}; // position (x,y,z)
     std::vector<double> u{0, 0, 1}; // rod orientation (ux,uy,uz)
@@ -49,8 +51,9 @@ struct vertex {
     double dAK; // in bulk: K*dA, on edge: 0
     double un2; // local un2
 };
-class dtmc_lc {
-  public:
+class dtmc_lc
+{
+public:
     // eternal parameters
     double beta; // system temperature
     int N;       // number of beads
@@ -88,29 +91,6 @@ class dtmc_lc {
 
     // measure observables related to these ind and bond
     double E_m(observable Ob);
-    // TODO: refactor observables into this stuct
-    double E; // system energy
-    // E=0.5*kar*I2H2+lam*Les-Kd*Tp2uu-Kt*Tuuc+0.5*Cn*(N-Tun2)+kargd*IKun2
-
-    // membrane geometry related
-    double I2H2;             // integral of dA(2h)^2
-    std::vector<double> Les; // length of the boundary (edge)
-    // double Ikg;   // integral of geodesic curvature
-    // liquid crystal related
-    double Tp2uu; // sum P2(u dot u) need to be divided by Bond_num for analysis
-    double Tuuc;  // sum (u cross u) dot r times (u dot u), [twist],  need
-                  // to be divided by Bond_num for analysis
-
-    // geometric couples crystalline
-    double Tun2;  // sum (u dot n)^2
-    double IKun2; // integral of depletion-like gaussian curvature tilt coupling
-
-    // other observables
-    int Bond_num; // total number of bonds
-    //  edge_lists.size()+0.5*bond_list.size()
-    double IdA; // integral of dA
-    double I2H; // integral of dA(2H)
-    double IK;  // integral of dA(K)
 
     // randomnumber generators
     std::mt19937 gen;
@@ -194,8 +174,6 @@ class dtmc_lc {
     // experiment
     void State_write(std::string filename);
     // write system state to file
-    void shape_set(double theta);
-    // set cap-like shape for testing
     void State_write_seq(std::string filename, int MC_sweeps, int step_p_sweep,
                          double delta_s, double delta_theta);
 
@@ -211,7 +189,6 @@ class dtmc_lc {
     // energy versus lambda curve testing
 
     // little tool
-    void O_reset();
     int energy_check(); // check if the energy set are correct, for debug use
     int sort_nei(int index);
     int list_a_nei_b(std::vector<int> a, int b);

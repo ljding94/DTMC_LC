@@ -72,6 +72,7 @@ void dtmc_lc::State_load(std::string state_file)
             // std::cout << buff << "\n";
         }
         // load geometric obsevables
+        /*
         std::getline(f, buff, '=');
         std::getline(f, buff);
         Les[0] = std::stof(buff);
@@ -84,6 +85,7 @@ void dtmc_lc::State_load(std::string state_file)
         IK = std::stof(buff);
         std::getline(f, buff, '=');
         std::getline(f, buff);
+        */
         max_nei_size = std::stof(buff);
         // skipp another line
         std::getline(f, buff);
@@ -136,7 +138,7 @@ void dtmc_lc::State_load(std::string state_file)
             }
         }
     }
-    E = 0;
+    //E = 0;
 }
 
 void dtmc_lc::State_write_seq(std::string filename, int MC_sweeps,
@@ -150,48 +152,6 @@ void dtmc_lc::State_write_seq(std::string filename, int MC_sweeps,
         savename = filename;
         savename.insert(savename.size() - 4, "_" + std::to_string(sweep_n));
         State_write(savename);
-    }
-}
-
-void dtmc_lc::shape_set(double theta)
-{
-    // set a spherical cap with angle θ
-    // R = r/cos(θ)
-    double R2;
-    int ind_j; // index of jth neighbour
-    double p2uu_local;
-    double un2_local;
-    R2 = std::pow(mesh[edge_lists[0][0]].R[0], 2) +
-         std::pow(mesh[edge_lists[0][0]].R[1], 2);
-    R2 = R2 / std::pow(std::sin(theta), 2);
-    for (int i = 0; i < mesh.size(); i++)
-    {
-        mesh[i].R[2] = std::sqrt(R2 - std::pow(mesh[i].R[0], 2) -
-                                 std::pow(mesh[i].R[1], 2)) -
-                       std::sqrt(R2) * std::cos(theta);
-    }
-    E = 0;
-    for (int e = 0; e < Ne; e++)
-    {
-        Les[e] = 0;
-    }
-
-    for (int i = 0; i < mesh.size(); i++)
-    {
-        mesh[i].ds = ds_m(i);
-        mesh[i].dAn2H = dAn2H_m(i);
-        mesh[i].n = n_m(i);
-        mesh[i].dAK = dAK_m(i);
-        Les[mesh[i].edge_num] += mesh[i].ds;
-        p2uu_local = 0;
-        for (int j = 0; j < mesh[i].nei.size(); j++)
-        {
-            ind_j = mesh[i].nei[j];
-            p2uu_local +=
-                0.5 * std::pow(innerproduct(mesh[i].u, mesh[ind_j].u), 2);
-        }
-        un2_local = std::pow(innerproduct(mesh[i].u, mesh[i].n), 2);
-        E += -Kd * p2uu_local - 0.5 * Cn * un2_local;
     }
 }
 
@@ -261,12 +221,12 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
         for (int i = 0; i < step_p_sweep; i++)
         {
             bead_accept += bead_metropolis(delta_s);
-            spin_accept += spin_metropolis(delta_theta);
-            bond_accept += bond_metropolis();
-            bond_accept += bond_metropolis();
+            //spin_accept += spin_metropolis(delta_theta);
+            //bond_accept += bond_metropolis();
+            //bond_accept += bond_metropolis();
             if (i % int(std::sqrt(N)) == 0)
             {
-                edge_accept += edge_metropolis();
+                //edge_accept += edge_metropolis();
             }
         }
         E_all.push_back(Ob_sys.E);

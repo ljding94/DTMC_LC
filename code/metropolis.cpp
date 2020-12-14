@@ -54,7 +54,7 @@ int dtmc_lc::bead_metropolis(double delta_s)
 #pragma endregion
 
 #pragma region : bead MC update proposal
-    for (int k = 0; k < 3; k++)
+    for (int k = 0; k < 2; k++)
     {
         delta_pos[k] = 2 * delta_s * rand_uni(gen) - delta_s;
         mesh[index].R[k] += delta_pos[k];
