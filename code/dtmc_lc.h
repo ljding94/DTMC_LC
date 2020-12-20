@@ -23,9 +23,10 @@ struct observable
     double Tun2;
     double IKun2;
     // miscellany
-    double IdA;   // integral of dA
-    double I2H;   // integral of dA(2H)
-    double IK;    // integral of dA(K)
+    double IdA; // integral of dA
+    double I2H; // integral of dA(2H)
+    double IK;  // integral of dA(K)
+    //TODO: implement this observable
     int Bond_num; // total number of bonds
 };
 struct vertex
@@ -57,6 +58,7 @@ public:
     // eternal parameters
     double beta; // system temperature
     int N;       // number of beads
+    int rd;      // radius for disk-shape initialization
     int Ne;      // number of edges
     int L;       // vertical height of cylinder initialization
     // also used to set fixed distance betwen two beads
@@ -98,12 +100,13 @@ public:
     std::uniform_real_distribution<> rand_uni; // uniform distribution
 
     // initialization
-    dtmc_lc(double beta_, int N_, int Ne_, int L_, double d0_, double l0_,
+    dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, double l0_,
             double kar_, double lam_, double Kd_, double Kt_, double Cn_,
             double kargd_);
 
     // put the beads and bonds in to position accordingly
     void init_rhombus_shape(double d0_);
+    void init_disk_shape(int rd, double d0_);
     void init_cylinder_shape(double d0_);
 
     void reset_config();

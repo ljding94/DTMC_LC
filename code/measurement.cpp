@@ -54,6 +54,7 @@ double dtmc_lc::distancefp(int ind_1, std::vector<double> p)
 
 int dtmc_lc::sort_nei(int index)
 {
+    // nei list can be sorted as long as two edge_nei are next to each other in the nei list
     std::vector<int> index_nei = mesh[index].nei;
     std::vector<int> index_enei = mesh[index].edge_nei;
     if (mesh[index].edge_nei.size() == 0)

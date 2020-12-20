@@ -5,13 +5,12 @@
 #define PI 3.14159265358979323846
 
 // initialization
-dtmc_lc::dtmc_lc(double beta_, int N_, int Ne_, int L_, double d0_, double l0_,
-                 double kar_, double lam_, double Kd_, double Kt_, double Cn_,
-                 double kargd_)
+dtmc_lc::dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, double l0_, double kar_, double lam_, double Kd_, double Kt_, double Cn_, double kargd_)
 {
     // system related
     beta = beta_;
     N = N_;
+    rd = rd_;
     Ne = Ne_;
     L = L_;
     l0 = l0_; // sigma0 is always 1;
@@ -38,7 +37,14 @@ dtmc_lc::dtmc_lc(double beta_, int N_, int Ne_, int L_, double d0_, double l0_,
     // if L=sqrt(N), N can't be 700
     if (Ne == 1)
     {
-        init_rhombus_shape(d0_);
+        if (rd != 0)
+        {
+            init_disk_shape(rd, d0_);
+        }
+        else
+        {
+            init_rhombus_shape(d0_);
+        }
     }
     else if (Ne == 2)
     {
@@ -102,7 +108,6 @@ dtmc_lc::dtmc_lc(double beta_, int N_, int Ne_, int L_, double d0_, double l0_,
     }
     Ob_sys.E = 0.5 * Cn * N;
     Ob_sys.E += E_m(Ob_sys);
-    std::cout << "IK=" << Ob_sys.IK;
 
     // set random number generators
     std::random_device rd;
@@ -283,6 +288,126 @@ void dtmc_lc::init_rhombus_shape(double d0_)
         }
     }
 }
+
+void dtmc_lc::init_disk_shape(int rd, double d0_)
+{ //TODO: set up dis shape initialization bases old code
+    int x_n, y_n;
+    double disi2c, dise2c;
+    int nei_pos = 0;
+
+    std::vector<vertex> init_mesh; // initial rhombus-shape mesh
+    init_mesh.resize((4 * rd + 1) * (4 * rd + 1));
+    std::vector<int> init2after_index(init_mesh.size(), -1);
+
+    // f[# in init_mesh] = # in mesh, -1 as default
+    mesh.clear();
+    std::vector<int> nei_dist = {1, 4 * rd + 1, 4 * rd, -1, -4 * rd - 1, -4 * rd};
+    dise2c = std::pow(d0_ * rd, 2);
+    for (int i = 0; i < init_mesh.size(); i++)
+    {
+        x_n = i % (4 * rd + 1) - 2 * rd;
+        y_n = i / (4 * rd + 1) - 2 * rd; //-2r is for centralization
+        init_mesh[i].R[0] = d0_ * (x_n + 0.5 * y_n);
+        init_mesh[i].R[1] = d0_ * 0.5 * std::sqrt(3) * y_n;
+        init_mesh[i].R[2] = 0;
+        // put neighbors as if every on is in-bulk
+        init_mesh[i].edge_num = -1;
+        //ignore bead on init_mesh edge
+        for (int j = 0; j < 6; j++)
+        {
+            nei_pos = i + nei_dist[j];
+            if (0 <= nei_pos && nei_pos < init_mesh.size())
+            {
+                //std::cout << "nei_pos=" << nei_pos << "\n";
+                init_mesh[i].nei.push_back(nei_pos);
+            }
+        }
+        // find position in real mesh;
+
+        disi2c = std::pow(init_mesh[i].R[0], 2) + std::pow(init_mesh[i].R[1], 2);
+        if (disi2c <= dise2c)
+        {
+            mesh.push_back(init_mesh[i]);
+            init2after_index[i] = mesh.size() - 1;
+        }
+    }
+    //corresting mesh nei index
+    N = mesh.size(); // assign the system size parameter
+    std::vector<int> new_nei_cache;
+    std::vector<int> ind_nei_cache;
+
+    for (int i = 0; i < mesh.size(); i++)
+    {
+        new_nei_cache.clear();
+        ind_nei_cache.clear();
+        for (int j = 0; j < mesh[i].nei.size(); j++)
+        {
+            if (init2after_index[mesh[i].nei[j]] != -1)
+            {
+                new_nei_cache.push_back(init2after_index[mesh[i].nei[j]]);
+                ind_nei_cache.push_back(init2after_index[mesh[i].nei[j]] - i);
+            }
+        } // end for mesh[i].nei
+
+        mesh[i].nei = new_nei_cache;
+
+        // edge bead?
+        if (mesh[i].nei.size() < 6)
+        {
+            mesh[i].edge_num = 0;
+            edge_lists[0].push_back(i);
+        }
+        else
+        { // if in-bulk, add all bond to bond list
+            push_bneis_list(i, ind_nei_cache);
+        }
+    } // end of mesh connection
+    // time take care of beads on the edge
+    //FIXME: fix nei order
+    // FIXME:
+    // edge_nei[0] must be nei[0] edge_nei[1] must be nei[-1]
+    int nei_p, ind;
+    std::vector<int> enei_cache; // neighbors on the edge
+    std::vector<int> bnei_cache; // neighbors in the bulk
+    for (int i = 0; i < edge_lists[0].size(); i++)
+    {
+        ind = edge_lists[0][i];
+        enei_cache.clear();
+        bnei_cache.clear();
+        for (int j = 0; j < mesh[ind].nei.size(); j++)
+        {
+            nei_p = mesh[ind].nei[j];
+            if (mesh[nei_p].nei.size() < 6)
+            { // nei_p is on the edge
+                enei_cache.push_back(nei_p - ind);
+            }
+            else
+            { // nei_p is in the bulk
+                bnei_cache.push_back(nei_p - ind);
+            }
+        } // end for ind nei
+
+        push_eneis_back(ind, enei_cache);
+        // to be sorted
+        push_bneis_list(ind, bnei_cache);
+    }
+    int eind, eind_next, eind_cache;
+    eind = edge_lists[0][0];
+
+    do
+    {
+        eind_next = mesh[eind].edge_nei[1];
+        eind_cache = mesh[eind_next].edge_nei[0];
+        if (eind_cache != eind)
+        { //fix edge_nei direction of eind_next
+            mesh[eind_next].edge_nei[0] = eind;
+            mesh[eind_next].edge_nei[1] = eind_cache;
+        }
+
+        eind = eind_next;
+    } while (eind != edge_lists[0][0]);
+}
+
 void dtmc_lc::init_cylinder_shape(double d0_)
 {
     int x_n, y_n; // position of the vertex in the two vector coordinate

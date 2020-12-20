@@ -227,8 +227,11 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         file2read = foldername + "/"+head+"_"+f2rtail
         data = np.loadtxt(file2read, skiprows=2, delimiter=",", unpack=True)
         r,r_std=data[:2]
+        # analyze unu2
         unu2r_all.append(np.average(data[2:],axis=1))
         unu2rerr_all.append(np.std(data[2:],axis=1)/np.sqrt(len(data[1])))
+
+
         # analyze average edge to center distance
         r_ave.append(np.average(r))
         rho, cov0 = autocorrelation_function_fft(r)
@@ -272,11 +275,11 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
 
         # find lam_p
         fi=int(bin_num*0.5)
-        popt,pcov=curve_fit(tan_fit,rplot[fi:],tan_half[fi:],bounds=(0, [1., 1., 0.5]))
+        popt,pcov=curve_fit(tan_fit,rplot[fi:],tan_half[fi:],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:],absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
         rp=rplot[fi:]
         if(i in leg_ind):
-            axs[1,0].plot(rplot,tan_half-popt[2],linestyle="None",marker="o",mfc="None",ms=3)
+            axs[1,0].errorbar(rplot,tan_half-popt[2],yerr=tan_halferr,linestyle="None",marker="o",mfc="None",ms=3)
             axs[1,0].plot(rp,tan_fit(rp,*popt)-popt[2],color=axs[1,0].lines[-1].get_color(),linestyle=Linestyle,label=Label)
 
         #print("popt,popterr",popt,popterr)

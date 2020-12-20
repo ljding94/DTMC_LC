@@ -22,7 +22,7 @@ def config_plot_xyz(filename,mesh=False,tag="", Format="pdf",lim=15,fix_index=No
     print("plotting",filename)
     data = np.loadtxt(filename, skiprows=6, delimiter=",", unpack=True)
     x,y,z,sx,sy,sz,dA,I2H,ds,dAK,un2,enum, en0, en1 = data[:14]
-    d=2
+    d=1
     #sx,sy,sz=d*sx,d*sy,d*sz
     #x,y,z,sx,sy,sz, enum, en0, en1 = data[5:14]
     x_min, x_max = np.min(x),np.max(x)
@@ -67,15 +67,16 @@ def config_plot_xyz(filename,mesh=False,tag="", Format="pdf",lim=15,fix_index=No
                     y[j], y[int(ens[i, j])]], "-",linewidth=0.5, color=ecolors[int(enum[j])], alpha=alpha_xy[j])
                 ax_zx.plot([z[j], z[int(ens[i, j])]],[x[j], x[int(ens[i, j])]], "-",linewidth=0.5, color=ecolors[int(enum[j])], alpha=alpha_zx[j])
     # spin vector
-    #nu=find_nu(sx,sy,sz)
-    nu=[0,0,1]
+    nu=find_nu(sx,sy,sz)
+    #nu=[0,0,1]
     x_ave,y_ave,z_ave = np.average(x),np.average(y),np.average(z)
     D_ave = 3
     ax_xy.plot([x_ave-D_ave*nu[0],x_ave+D_ave*nu[0]],[y_ave-D_ave*nu[1],y_ave+D_ave*nu[1]],"-",linewidth=3.0,color="k")
     ax_zx.plot([z_ave-D_ave*nu[2],z_ave+D_ave*nu[2]],[x_ave-D_ave*nu[0],x_ave+D_ave*nu[0]],"-",linewidth=3.0,color="k")
 
-    snu=sx*nu[0]+sy*nu[1]+sz*nu[2]
-    deg = np.arccos(np.absolute(snu))
+    #snu=sx*nu[0]+sy*nu[1]+sz*nu[2]
+    #deg = np.arccos(np.absolute(snu))
+    deg = np.arccos(np.absolute(un2))
     norm=Normalize(vmin=0,vmax=0.5*np.pi)
     cmap = cm.get_cmap("jet_r")
     for i in range(len(x)):
