@@ -250,6 +250,10 @@ def sqrt_fit(x,a):
 def sqrt_fit_neg(x,a):
     return a/np.sqrt(x)
 
+def a_bx(x,a,b):
+    return a+b*x
+
+
 def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
     xLabel = mode
     Kd_ind = find_cpar_ind(par_nm,"Kd")
@@ -301,30 +305,37 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
         cpmin=cpar_pKd_all.min()
         cpmax=cpar_pKd_all.max()
         cpar_plt=np.linspace(cpmin,cpmax,100)
-        #TODO: replace poly fit with curve_fit, fint chi2/dof for squared fit
+
         popt,pcov=curve_fit(sqrt_fit_neg,cpar_pKd_all,lamp_all, sigma=lamperr_all,absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
         #chi2 = np.sum(np.power((sqrt_fit_neg(cpar_pKd_all,*popt) - lamp_all)/lamperr_all,2))
         chi2 = np.sum(np.power((sqrt_fit_neg(cpar_pKd_all,*popt) - lamp_all),2)/sqrt_fit_neg(cpar_pKd_all,*popt))
         chi2nu = chi2/(len(cpar_pKd_all)-1)
-        print("chi2,chi2nv")
         p =1 - stats.chi2.cdf(chi2, df=len(cpar_pKd_all)-1)
         print(p,1 - stats.chi2.cdf(chi2nu*(len(cpar_pKd_all)-1), (len(cpar_pKd_all)-1)))
-        print(chi2nu*(len(cpar_pKd_all)-1),(len(cpar_pKd_all)-1))
-        print("chi2nu,",chi2nu)
+
         axs[0,1].fill_between(cpar_plt,sqrt_fit_neg(cpar_plt,*popt-popterr),sqrt_fit_neg(cpar_plt,*popt+popterr),alpha=0.4,label=r"$\lambda_p=%.2f/\sqrt{\frac{C_n}{K_d}}f$"%popt[0])
         axs[0,1].legend()
 
+        popt,pcov=curve_fit(a_bx,np.log(cpar_pKd_all),np.log(lamp_all))
+        popterr = np.diag(pcov)**0.5
+        print("line log fit:",popt,popterr)
+        axs[1,1].fill_between(cpar_plt,np.exp(a_bx(np.log(cpar_plt),*popt-popterr)),np.exp(a_bx(np.log(cpar_plt),*popt+popterr)),alpha=0.4,label=r"$\lambda_p=%.2f(C_n/K_d)^{%.2f\pm%.2f},\chi^2_\nu=%.2f,p=%.3f$"%(popt[0],popt[1],popterr[1],chi2nu,p))
+
+        '''
         popt,pcov=curve_fit(exp_fit,cpar_pKd_all,lamp_all, sigma=lamperr_all,p0=[1.0,-0.5],absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
+        print("direct exponent fit:",popt,popterr)
         chi2nu = np.sum(np.power((exp_fit(cpar_pKd_all,*popt) - lamp_all),2)/exp_fit(cpar_pKd_all,*popt))/(len(cpar_pKd_all)-1)
         p =1 - stats.chi2.cdf(chi2nu, 1)
         print("chi2nu,",chi2nu)
         axs[1,1].fill_between(cpar_plt,exp_fit(cpar_plt,*popt-popterr),exp_fit
         (cpar_plt,*popt+popterr),alpha=0.4,label=r"$\lambda_p=%.2f(C_n/K_d)^{%.2f\pm%.2f},\chi^2_\nu=%.2f,p=%.3f$"%(popt[0],popt[1],popterr[1],chi2nu,p))
         print(popt)
+        '''
         axs[1,1].legend()
         O_cpar_plot(axs[1,1],lamp,lamperr,O_label,"lamp",r"$\lambda_p$",cpar_pKd,None,None,Ms=5)
+
         axs[1,1].set_xscale("log")
         axs[1,1].set_yscale("log")
         axs[1,1].set_xlabel(r"$C_n/K_d$")

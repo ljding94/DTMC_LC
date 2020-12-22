@@ -112,8 +112,7 @@ dtmc_lc::dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, dou
     // set random number generators
     std::random_device rd;
     std::mt19937 gen_set(rd());
-    std::uniform_int_distribution<> rand_pos_set(0,
-                                                 mesh.size() - 1); // random pos
+    std::uniform_int_distribution<> rand_pos_set(0, mesh.size() - 1); // random pos
     std::uniform_real_distribution<> rand_uni_set(0, 1);
     gen = gen_set;
     rand_pos = rand_pos_set;
@@ -289,24 +288,24 @@ void dtmc_lc::init_rhombus_shape(double d0_)
     }
 }
 
-void dtmc_lc::init_disk_shape(int rd, double d0_)
+void dtmc_lc::init_disk_shape(int rb, double d0_)
 { //TODO: set up dis shape initialization bases old code
     int x_n, y_n;
     double disi2c, dise2c;
     int nei_pos = 0;
 
     std::vector<vertex> init_mesh; // initial rhombus-shape mesh
-    init_mesh.resize((4 * rd + 1) * (4 * rd + 1));
+    init_mesh.resize((4 * rb + 1) * (4 * rb + 1));
     std::vector<int> init2after_index(init_mesh.size(), -1);
 
     // f[# in init_mesh] = # in mesh, -1 as default
     mesh.clear();
-    std::vector<int> nei_dist = {1, 4 * rd + 1, 4 * rd, -1, -4 * rd - 1, -4 * rd};
-    dise2c = std::pow(d0_ * rd, 2);
+    std::vector<int> nei_dist = {1, 4 * rb + 1, 4 * rb, -1, -4 * rb - 1, -4 * rb};
+    dise2c = std::pow(d0_ * rb, 2);
     for (int i = 0; i < init_mesh.size(); i++)
     {
-        x_n = i % (4 * rd + 1) - 2 * rd;
-        y_n = i / (4 * rd + 1) - 2 * rd; //-2r is for centralization
+        x_n = i % (4 * rb + 1) - 2 * rb;
+        y_n = i / (4 * rb + 1) - 2 * rb; //-2r is for centralization
         init_mesh[i].R[0] = d0_ * (x_n + 0.5 * y_n);
         init_mesh[i].R[1] = d0_ * 0.5 * std::sqrt(3) * y_n;
         init_mesh[i].R[2] = 0;

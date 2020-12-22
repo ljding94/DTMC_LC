@@ -18,7 +18,7 @@ def find_nu(ux,uy,uz):
             return np.transpose(v)[i]
 
 
-def config_plot_xyz(filename,mesh=False,tag="", Format="pdf",lim=15,fix_index=None):
+def config_plot_xyz(filename,mesh=False,rod=True,tag="", Format="pdf",lim=15,fix_index=None):
     print("plotting",filename)
     data = np.loadtxt(filename, skiprows=6, delimiter=",", unpack=True)
     x,y,z,sx,sy,sz,dA,I2H,ds,dAK,un2,enum, en0, en1 = data[:14]
@@ -38,11 +38,13 @@ def config_plot_xyz(filename,mesh=False,tag="", Format="pdf",lim=15,fix_index=No
     ax_xy = fig.add_subplot(121, aspect="equal")
     ax_zx = fig.add_subplot(122, aspect="equal")
     # bulk bond
-    '''
-    for i in range(len(x)):
+
+    # track bead ind #
+    if(0):
+        for i in range(len(x)):
             pass
             ax_xy.annotate(i, (x[i], y[i]), fontsize=5)
-    '''
+
     if(mesh):
         bonds = []
         for i in range(len(ns)):
@@ -79,9 +81,10 @@ def config_plot_xyz(filename,mesh=False,tag="", Format="pdf",lim=15,fix_index=No
     deg = np.arccos(np.absolute(un2))
     norm=Normalize(vmin=0,vmax=0.5*np.pi)
     cmap = cm.get_cmap("jet_r")
-    for i in range(len(x)):
-        ax_xy.plot([x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],[y[i]-0.5*d*sy[i],y[i]+0.5*d*sy[i]],"-",linewidth=1.5,color=cmap(deg[i]))
-        ax_zx.plot([z[i]-0.5*d*sz[i],z[i]+0.5*d*sz[i]],[x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],"-",linewidth=1.5,color=cmap(deg[i]))
+    if(rod):
+        for i in range(len(x)):
+            ax_xy.plot([x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],[y[i]-0.5*d*sy[i],y[i]+0.5*d*sy[i]],"-",linewidth=1.5,color=cmap(deg[i]))
+            ax_zx.plot([z[i]-0.5*d*sz[i],z[i]+0.5*d*sz[i]],[x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],"-",linewidth=1.5,color=cmap(deg[i]))
     #plot fixed bead (if have)
     if fix_index:
         ax_xy.plot([x[fix_index[0]], x[fix_index[1]]], [y[fix_index[0]], y[fix_index[1]]], marker="o",linestyle="None", color="purple")

@@ -1,4 +1,4 @@
-Compile=g++ -g -std=c++11
+Compile=g++ -g -std=c++17
 dtmc_lc: main.o dtmc_lc.o metropolis.o measurement.o experiment.o
 	${Compile} -o dtmc_lc main.o dtmc_lc.o metropolis.o  measurement.o experiment.o
 main.o: main.cpp dtmc_lc.h

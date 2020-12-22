@@ -10,7 +10,7 @@ int main(int argc, char const *argv[])
     std::clock_t c_start = std::clock();
     double beta = 1;
     int N;      // number of beads
-    int rd = 0; //radius for dis-shape initialization
+    int rb = 0; //radius for dis-shape initialization
     int Ne = 1; // number of edges
     int Lr;     // number of bead per line
     int L;      // number of bead on vertical direction, used for cylinder
@@ -44,14 +44,10 @@ int main(int argc, char const *argv[])
     Kt = q * Kd;
     int bin_num_r = 60;
     bool fix_bead_on = 0;
-    if (L > 0)
-    { // fix two beads, use rhombus shape initilization
-        fix_bead_on = 1;
-    }
-    else if (L == -1)
+    if (L == -1)
     {
         //use rhombus shape initilization
-        rd = int(std::sqrt(N / 4));
+        rb = int(std::sqrt(N / 4));
     }
     else if (L == 0)
     {
@@ -68,9 +64,13 @@ int main(int argc, char const *argv[])
             Lr = N / L;
         }
     }
+    else if (L > 0)
+    { // fix two beads, use rhombus shape initilization
+        fix_bead_on = 1;
+    }
     std::string finfo;
     finfo = "N" + std::string(argv[1]) + "_Ne" + std::string(argv[2]) + "_L" + std::string(argv[3]) + "_kar" + std::string(argv[4]) + "_lam" + std::string(argv[5]) + "_Kd" + std::string(argv[6]) + "_q" + std::string(argv[7]) + "_Cn" + std::string(argv[8]) + "_kargd" + std::string(argv[9]);
-    dtmc_lc membrane(beta, N, rd, Ne, L, d0, l0, kar, lam, Kd, Kt, Cn, kargd);
+    dtmc_lc membrane(beta, N, rb, Ne, L, d0, l0, kar, lam, Kd, Kt, Cn, kargd);
     N = membrane.mesh.size();
     if (argc == 11)
     {
@@ -92,7 +92,7 @@ int main(int argc, char const *argv[])
         membrane.State_write(folder + "/State_" + finfo + "_init.txt");
         membrane.Thermal(0, int(N / (delta_s * delta_s)) + 1, 2, delta_s, delta_theta);
         // membrane.O_MC_measure(5, 1, int(N / (ds * ds)) + 1, ds,
-        membrane.O_MC_measure(1, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r);
+        membrane.O_MC_measure(10, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r);
         // membrane.O_MC_measure(2, 1, 0, delta_s, delta_theta, folder,
         // finfo,bin_num_r);
         membrane.State_write(folder + "/State_" + finfo + ".txt");

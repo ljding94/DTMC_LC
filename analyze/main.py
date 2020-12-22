@@ -9,18 +9,12 @@ from analyze import *
 
 def main():
     print("hello! dtmc_lc analysis")
-    #config_plot_xyz("../data/scratch_local/State_N50_Ne1_L0_kar5_lam3.0_Kd2.0_q0.0_Cn2.0_kargd2.0.txt",mesh=1)
-    config_plot3D("../data/scratch_local/State_N400_Ne1_L-1_kar15_lam6.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
-    config_plot3D("../data/scratch_local/State_N400_Ne1_L0_kar15_lam6.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
-    config_plot3D("../data/scratch_local/State_N400_Ne1_L30_kar15_lam6.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
-    config_plot3D("../data/scratch_local/State_N400_Ne2_L0_kar15_lam6.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
+    #config_plot_xyz("../data/scratch_local/State_N200_Ne1_L-1_kar10_lam5.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt",mesh=1)
+    #config_plot3D("../data/scratch_local/State_N400_Ne1_L-1_kar15_lam6.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
+    #config_plot3D("../data/Ne1/Dec19_2020_1/State_N400_Ne1_L0_kar15_lam6.0_Kd6.0_q1.4_Cn3.0_kargd1.0.txt")
 
-    #config_plot3D("../data/scratch_local/State_N0_rd10_Ne1_L0_kar10_lam5.0_Kd0.0_q0.0_Cn0.0_kargd0.0.txt")
-    #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd1.0.txt")
-    #config_plot3D("../data/Ne1/Dec8_2020/State_N400_Ne1_L0_kar15_lam5.0_Kd4.0_Kt6.0_Cn5.0_kargd5.0.txt")
-    #config_plot3D("../data/Ne1/Dec17_2020/State_N200_Ne1_L0_kar10_lam4.0_Kd2.0_q0.3_Cn2.0_kargd3.0 .txt")
-    return 0
-    foldername = "../data/Ne1/Dec19_2020"
+    #return 0
+    foldername = "../data/Ne1/Dec22_2020"
     print("analyzing "+foldername)
     pars = []
     colors = []
@@ -37,13 +31,13 @@ def main():
     kar = 15
     lams = np.linspace(4.0,50.0,93)
     lam=6.0
-    Kds = np.arange(4.0,20.1,2.0)
-    Kd=3.0
+    Kds = np.arange(3.0,17.1,2.0)
+    Kd=6.0
     qs=np.arange(0.2,2.1,0.2)
-    q=0.2
-    Cns=np.arange(3.0,20.1,2.0)
-    Cn=3.0
-    kargds=np.arange(1.0,10.1,1.0)
+    q=0.8
+    Cns=np.arange(5.0,21.1,2.0)
+    Cn=6.0
+    kargds=np.arange(1.0,5.1,1.0)
     kargd=0.0
     Ne1pars = []
     Ne2pars = []
@@ -61,12 +55,12 @@ def main():
             #twistl_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,d0=1.5,head="nunu2lcov",tag=r"$K_d=%.1f$"%Kd,leg_num=4,bin_num=20)
             #twistl_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,d0=1.5,head="nu0nu2l",tag=r"$K_d=%.1f$"%Kd,leg_num=4,bin_num=20)
             pass
-            #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=4,bin_num=80)
+            #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=4,bin_num=60)
 
         for kargd in kargds[::2]:
             if(i%2==0):
                 filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kargd%.1f.txt" % (N, Ne, L, kar,lam,Kd,q,Cn, kargd)
-                config_plot_xyz(filename, tag=r"$K_d=%.1f,q=%.1f,C_n=%.1f,\kappa_d=%.1f$" % (Kd,q,Cn,kargd),Format="png")
+                #config_plot_xyz(filename, tag=r"$K_d=%.1f,q=%.1f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
 
         #print("sleeping...")
         #time.sleep(10)

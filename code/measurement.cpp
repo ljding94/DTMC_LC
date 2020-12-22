@@ -61,10 +61,13 @@ int dtmc_lc::sort_nei(int index)
     {
         return 0;
     }
+    /*
+    don't understand why I added this condition
     if (mesh[index].nei.size() == 3)
     {
         return 0;
     }
+    */
     while (mesh[index].nei[0] != mesh[index].edge_nei[0])
     {
         mesh[index].nei.push_back(mesh[index].nei[0]);

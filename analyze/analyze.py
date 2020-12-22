@@ -272,10 +272,12 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         cos = np.sqrt(unu2r_all[i])
         tan_half = np.sqrt((1-cos)/(1+cos))
         tan_halferr = unu2rerr_all[i]/(tan_half*2*cos*(1+cos)*(1+cos))
-
+        print("len(tan_half)",len(tan_half))
+        print("tan_half",tan_half)
         # find lam_p
         fi=int(bin_num*0.5)
-        popt,pcov=curve_fit(tan_fit,rplot[fi:],tan_half[fi:],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:],absolute_sigma=True)
+        print("tan_half[fi:]",tan_half[fi:])
+        popt,pcov=curve_fit(tan_fit,rplot[fi:-5],tan_half[fi:-5],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:-5],absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
         rp=rplot[fi:]
         if(i in leg_ind):
