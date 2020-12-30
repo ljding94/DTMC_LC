@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from plot import *
 from autocorrelation import *
 from scipy.optimize import curve_fit
+from scipy import odr
 
 def find_cpar_ind(par_nm,mode):
     cpar_ind = -1
@@ -199,8 +200,6 @@ def O_stat_ana_Ls(foldername, L, kar, lam):
             f.write("%f,%f,%f,%f,%f\n" % (
                 L[i], En_ave[i], En_std[i], L_ave[i], L_std[i]))
 
-
-
 def tan_fit(x,tan0, lam_p,tanc):
     return tan0*np.exp((x-1)/lam_p)+tanc
 
@@ -208,6 +207,19 @@ def sqrt_fit(x,a):
     return a/np.sqrt(x)
 def exp_fit(x,a,b):
     return a*np.power(x,b)
+
+def odr_tan_fit(p,x):
+    return p[0]*np.exp((x-1)/p[1])+p[2]
+
+def odr_lamp_popt(xdata,ydata,xerr,yerr):
+    tan = odr.Model(odr_tan_fit)
+    data = odr.RealData(xdata,ydata,sx=xerr,sy=yerr)
+    odr_fit = odr.ODR(data,tan,beta0=[0.5,0.2,0.1])
+    output=odr_fit.run()
+    #print("output.beta",output.beta)
+    #print("output.sd_beta",output.sd_beta)
+    #output.pprint()
+    return (output.beta,output.sd_beta)
 
 def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",leg_num=5,bin_num=40):
     Ne = par[find_cpar_ind(par_nm,"Ne")]
@@ -260,6 +272,8 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
     fig, axs = plt.subplots(2, 2, figsize=(
         246 / ppi*2, 246 / ppi * 2*0.8))  # , sharex=True
     rplot = np.linspace(1/bin_num,1,bin_num)-0.5/bin_num
+    rperr = np.ones(len(rplot))/(bin_num*np.sqrt(3))
+    # use 1/sqrt(3) for uniform distribution error
 
     for i in range(len(cpar)):
         pass
@@ -272,13 +286,20 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         cos = np.sqrt(unu2r_all[i])
         tan_half = np.sqrt((1-cos)/(1+cos))
         tan_halferr = unu2rerr_all[i]/(tan_half*2*cos*(1+cos)*(1+cos))
-        print("len(tan_half)",len(tan_half))
-        print("tan_half",tan_half)
+        #print("len(tan_half)",len(tan_half))
+        #print("tan_half",tan_half)
         # find lam_p
         fi=int(bin_num*0.5)
-        print("tan_half[fi:]",tan_half[fi:])
-        popt,pcov=curve_fit(tan_fit,rplot[fi:-5],tan_half[fi:-5],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:-5],absolute_sigma=True)
+        #print("tan_half[fi:]",tan_half[fi:])
+        popt,pcov=curve_fit(tan_fit,rplot[fi:],tan_half[fi:],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:],absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
+        print("curve_fit",popt,popterr)
+        print("try odr fit")
+        popt,popterr = odr_lamp_popt(rplot[fi:],tan_half[fi:],rperr[fi:],tan_halferr[fi:])
+        print("odr fit",popt,popterr)
+
+
+
         rp=rplot[fi:]
         if(i in leg_ind):
             axs[1,0].errorbar(rplot,tan_half-popt[2],yerr=tan_halferr,linestyle="None",marker="o",mfc="None",ms=3)

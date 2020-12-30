@@ -58,20 +58,20 @@ public:
     // eternal parameters
     double beta; // system temperature
     int N;       // number of beads
-    int rd;      // radius for disk-shape initialization
+    int rb;      // radius for disk-shape initialization
     int Ne;      // number of edges
     int L;       // vertical height of cylinder initialization
     // also used to set fixed distance betwen two beads
     double l0; // tether maximum length
     // double l1;
     //  edge tether maximum length, not needed for lc model
-    double kar;   // mean curvature bending stiffness
-    double karg;  // gaussian curvature bending stiffness
-    double lam;   // line tension coefficient
-    double Kd;    // liquid crystal interaction moduli
-    double Kt;    // liquid crystall twist interaction moduli
-    double Cn;    // liquid crystal to membrane normal moduli
-    double kargd; // depletion-like gaussian curvature bending stiffness
+    double kar;  // mean curvature bending stiffness
+    double karg; // gaussian curvature bending stiffness just for geodesic curvature
+    double lam;  // line tension coefficient
+    double Kd;   // liquid crystal interaction moduli
+    double Kt;   // liquid crystall twist interaction moduli
+    double Cn;   // liquid crystal to membrane normal moduli
+    double kard; // depletion-like gaussian curvature bending stiffness
 
     // system configuration
 
@@ -100,13 +100,13 @@ public:
     std::uniform_real_distribution<> rand_uni; // uniform distribution
 
     // initialization
-    dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, double l0_,
-            double kar_, double lam_, double Kd_, double Kt_, double Cn_,
-            double kargd_);
+    dtmc_lc(double beta_, int N_, int rb_, int Ne_, int L_, double d0_, double l0_,
+            double kar_, double karg_, double lam_, double Kd_, double Kt_, double Cn_,
+            double kard_);
 
     // put the beads and bonds in to position accordingly
     void init_rhombus_shape(double d0_);
-    void init_disk_shape(int rd, double d0_);
+    void init_disk_shape(int rb, double d0_);
     void init_cylinder_shape(double d0_);
 
     void reset_config();

@@ -22,7 +22,7 @@ void dtmc_lc::State_write(std::string filename)
         }
         f << "beta=" << beta << "\n";
         f << "N=" << N << "\n";
-        f << "rd=" << rd << "\n";
+        f << "rb=" << rb << "\n";
         f << "l0=" << l0 << "\n";
         f << "max_nei_size=" << max_nei_size << "\n";
         f << "x,y,z,ux,uy,uz,dA,2H,ds,dAK,un2,edge_num,edge_neibs,neibs";
@@ -167,13 +167,13 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
             // std::cout << sweep_n << "/" << MC_sweeps << "\n";
             for (int i = 0; i < step_p_sweep; i++)
             {
-                bead_metropolis(delta_s);
+                //bead_metropolis(delta_s);
                 spin_metropolis(delta_theta);
-                bond_metropolis();
-                bond_metropolis();
+                //bond_metropolis();
+                //bond_metropolis();
                 if (i % int(std::sqrt(N)) == 0)
                 {
-                    edge_metropolis();
+                    //edge_metropolis();
                 }
             }
             // std::cout << "thermo, beta=" << beta << "," << sweep_n << "/"<<
@@ -218,6 +218,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     std::clock_t c_start = std::clock();
     for (int sweep_n = 0; sweep_n < MC_sweeps; sweep_n++)
     {
+        std::cout << sweep_n << "/" << MC_sweeps << "\n";
         for (int i = 0; i < step_p_sweep; i++)
         {
             bead_accept += bead_metropolis(delta_s);
@@ -254,7 +255,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
             else
             {
                 un2r_all.push_back(un2r_m(bin_num_r));
-                // unu2r_all.push_back(unu2r_m(bin_num_r));
+                unu2r_all.push_back(unu2r_m(bin_num_r));
             }
         }
     }

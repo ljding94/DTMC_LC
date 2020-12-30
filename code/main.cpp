@@ -19,12 +19,13 @@ int main(int argc, char const *argv[])
     double d0 = 1.5;
     double l0 = 1.73;
     double kar;
+    double karg;
     double lam;
     double Kd;
     double q; // Kt = Kd*q
     double Kt;
     double Cn;
-    double kargd;
+    double kard;
     // double delta_s = 0.2;
     double delta_s = 0.1;
     double delta_theta = 0.5;
@@ -35,11 +36,12 @@ int main(int argc, char const *argv[])
     Ne = std::atoi(argv[2]);
     L = std::atoi(argv[3]);
     kar = std::atof(argv[4]);
-    lam = std::atof(argv[5]);
-    Kd = std::atof(argv[6]);
-    q = std::atof(argv[7]);
-    Cn = std::atof(argv[8]);
-    kargd = std::atof(argv[9]);
+    karg = std::atof(argv[5]);
+    lam = std::atof(argv[6]);
+    Kd = std::atof(argv[7]);
+    q = std::atof(argv[8]);
+    Cn = std::atof(argv[9]);
+    kard = std::atof(argv[10]);
 
     Kt = q * Kd;
     int bin_num_r = 60;
@@ -69,10 +71,10 @@ int main(int argc, char const *argv[])
         fix_bead_on = 1;
     }
     std::string finfo;
-    finfo = "N" + std::string(argv[1]) + "_Ne" + std::string(argv[2]) + "_L" + std::string(argv[3]) + "_kar" + std::string(argv[4]) + "_lam" + std::string(argv[5]) + "_Kd" + std::string(argv[6]) + "_q" + std::string(argv[7]) + "_Cn" + std::string(argv[8]) + "_kargd" + std::string(argv[9]);
-    dtmc_lc membrane(beta, N, rb, Ne, L, d0, l0, kar, lam, Kd, Kt, Cn, kargd);
+    finfo = "N" + std::string(argv[1]) + "_Ne" + std::string(argv[2]) + "_L" + std::string(argv[3]) + "_kar" + std::string(argv[4]) + "_karg" + std::string(argv[5]) + "_lam" + std::string(argv[6]) + "_Kd" + std::string(argv[7]) + "_q" + std::string(argv[8]) + "_Cn" + std::string(argv[9]) + "_kard" + std::string(argv[10]);
+    dtmc_lc membrane(beta, N, rb, Ne, L, d0, l0, kar, karg, lam, Kd, Kt, Cn, kard);
     N = membrane.mesh.size();
-    if (argc == 11)
+    if (argc == 12)
     {
         // use "triangulation kar lam local" for local running
         // used for local running!
@@ -92,14 +94,14 @@ int main(int argc, char const *argv[])
         membrane.State_write(folder + "/State_" + finfo + "_init.txt");
         membrane.Thermal(0, int(N / (delta_s * delta_s)) + 1, 2, delta_s, delta_theta);
         // membrane.O_MC_measure(5, 1, int(N / (ds * ds)) + 1, ds,
-        membrane.O_MC_measure(10, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r);
+        membrane.O_MC_measure(40, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r);
         // membrane.O_MC_measure(2, 1, 0, delta_s, delta_theta, folder,
         // finfo,bin_num_r);
         membrane.State_write(folder + "/State_" + finfo + ".txt");
 
         return 0;
     }
-    else if (argc == 10)
+    else if (argc == 11)
     {
         // ccv running
         folder = "/users/lding3/scratch";

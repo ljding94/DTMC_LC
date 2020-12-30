@@ -5,12 +5,12 @@
 #define PI 3.14159265358979323846
 
 // initialization
-dtmc_lc::dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, double l0_, double kar_, double lam_, double Kd_, double Kt_, double Cn_, double kargd_)
+dtmc_lc::dtmc_lc(double beta_, int N_, int rb_, int Ne_, int L_, double d0_, double l0_, double kar_, double karg_, double lam_, double Kd_, double Kt_, double Cn_, double kard_)
 {
     // system related
     beta = beta_;
     N = N_;
-    rd = rd_;
+    rb = rb_;
     Ne = Ne_;
     L = L_;
     l0 = l0_; // sigma0 is always 1;
@@ -18,13 +18,14 @@ dtmc_lc::dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, dou
     // energy related
     // geometric
     kar = kar_;
+    karg = karg_;
     lam = lam_;
     // orientational
     Kd = Kd_;
     Kt = Kt_;
     // coupling
     Cn = Cn_;
-    kargd = kargd_;
+    kard = kard_;
 
     edge_lists.resize(Ne);
     for (int n = 0; n < Ne; n++)
@@ -37,9 +38,9 @@ dtmc_lc::dtmc_lc(double beta_, int N_, int rd_, int Ne_, int L_, double d0_, dou
     // if L=sqrt(N), N can't be 700
     if (Ne == 1)
     {
-        if (rd != 0)
+        if (rb != 0)
         {
-            init_disk_shape(rd, d0_);
+            init_disk_shape(rb, d0_);
         }
         else
         {
@@ -402,7 +403,7 @@ void dtmc_lc::init_disk_shape(int rb, double d0_)
             mesh[eind_next].edge_nei[0] = eind;
             mesh[eind_next].edge_nei[1] = eind_cache;
         }
-
+        sort_nei(eind_next); // sort nei list based on edge-nei
         eind = eind_next;
     } while (eind != edge_lists[0][0]);
 }

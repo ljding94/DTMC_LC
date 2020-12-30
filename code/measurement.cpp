@@ -213,13 +213,13 @@ void dtmc_lc::Ob_sys_update(observable Ob_new, observable Ob_old)
 double dtmc_lc::E_m(observable Ob)
 {
     double E = 0;
-    E += 0.5 * kar * Ob.I2H2;
+    E += 0.5 * kar * Ob.I2H2 + karg * Ob.IK;
     for (int e = 0; e < Ne; e++)
     {
         E += lam * Ob.Les[e];
     }
     E += -Kd * Ob.Tp2uu - Kt * Ob.Tuuc;
-    E += -0.5 * Cn * Ob.Tun2 + kargd * Ob.IKun2;
+    E += -0.5 * Cn * Ob.Tun2 + kard * Ob.IKun2;
     return E;
 }
 

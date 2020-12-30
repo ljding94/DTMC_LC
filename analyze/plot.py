@@ -110,7 +110,7 @@ def config_plot_xyz_seq(filename,Seq):
         config_plot_xyz(filename[:-4]+"_%d.txt"%i,Format="png")
 
 
-def config_plot3D(filename):
+def config_plot3D(filename,mesh=0,rod=0):
     data = np.loadtxt(filename, skiprows=6, delimiter=",", unpack=True)
     #x,y,z,sx,sy,sz,enum, en0, en1 = data[5:14]
     x,y,z,sx,sy,sz,dA,I2H,ds,dAK,un2,enum, en0, en1 = data[:14]
@@ -128,11 +128,12 @@ def config_plot3D(filename):
     fig = plt.figure(figsize=(5, 5))
     ax = plt.axes(projection="3d")
 
-    for i in range(len(ns)):
-        for j in range(len(ns[0])):
-            if ns[i, j] != -1:
-                pass
-                ax.plot3D([x[i], x[int(ns[i, j])]], [y[i], y[int(ns[i, j])]], [z[i], z[int(ns[i, j])]], "-",  color="tomato")
+    if(mesh):
+        for i in range(len(ns)):
+            for j in range(len(ns[0])):
+                if ns[i, j] != -1:
+                    pass
+                    ax.plot3D([x[i], x[int(ns[i, j])]], [y[i], y[int(ns[i, j])]], [z[i], z[int(ns[i, j])]], "-",  color="tomato")
 
     ecolors = ["blue","purple","green"]
     for i in range(len(ens)):
@@ -152,9 +153,9 @@ def config_plot3D(filename):
     cmap = cm.get_cmap("jet_r")
     norm=Normalize(vmin=0,vmax=0.5*np.pi)
     #deg = np.arccos(np.sqrt(un2))
-    for i in range(len(sx)):
-        pass
-        #ax.plot3D([x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],[y[i]-0.5*d*sy[i],y[i]+0.5*d*sy[i]],[z[i]-0.5*d*sz[i],z[i]+0.5*d*sz[i]],"-",color=cmap(norm(deg[i])))
+    if(rod):
+        for i in range(len(sx)):
+            ax.plot3D([x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],[y[i]-0.5*d*sy[i],y[i]+0.5*d*sy[i]],[z[i]-0.5*d*sz[i],z[i]+0.5*d*sz[i]],"-",color=cmap(norm(deg[i])))
     #ax.set_xlim(-t*max_xy, t*max_xy)
     #ax.set_ylim(-t*max_xy, t*max_xy)
     #ax.set_zlim(-t*max_xy, t*max_xy)
