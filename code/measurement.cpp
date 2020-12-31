@@ -417,6 +417,7 @@ double dtmc_lc::dAK_m(int index)
     }
     else
     {
+        return 0;
         K = PI;
         sort_nei(index);
     }
