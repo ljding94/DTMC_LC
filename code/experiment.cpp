@@ -167,13 +167,13 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
             // std::cout << sweep_n << "/" << MC_sweeps << "\n";
             for (int i = 0; i < step_p_sweep; i++)
             {
-                //bead_metropolis(delta_s);
+                bead_metropolis(delta_s);
                 spin_metropolis(delta_theta);
-                //bond_metropolis();
-                //bond_metropolis();
+                bond_metropolis();
+                bond_metropolis();
                 if (i % int(std::sqrt(N)) == 0)
                 {
-                    //edge_metropolis();
+                    edge_metropolis();
                 }
             }
             // std::cout << "thermo, beta=" << beta << "," << sweep_n << "/"<<

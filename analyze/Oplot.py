@@ -41,7 +41,7 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
         Les_err.append(data[6+3*e])
     Le_ave = np.sum(Les_ave,axis=0)
     Le_err = np.sqrt(np.sum(np.power(Les_err,2),axis=0))
-    IdA_ave, IdA_tau, IdA_err,I2H_ave, I2H_tau, I2H_err,I2H2_ave, I2H2_tau, I2H2_err, IK_ave, IK_tau, IK_err, ss2_ave, ss2_tau, ss2_err,uuc_ave, uuc_tau, uuc_err, Tun2_ave, Tun2_tau, Tun2_err, IKun2_ave,IKun2_tau,IKun2_err = data[7+3*(Ne-1):31+3*(Ne-1)]
+    IdA_ave, IdA_tau, IdA_err,I2H_ave, I2H_tau, I2H_err,I2H2_ave, I2H2_tau, I2H2_err, IK_ave, IK_tau, IK_err, ss2_ave, ss2_tau, ss2_err,uuc_ave, uuc_tau, uuc_err, un2_ave, un2_tau, un2_err, IKun2_ave,IKun2_tau,IKun2_err = data[7+3*(Ne-1):31+3*(Ne-1)]
     F_ave,F_err=[],[]
     cpar_tsqN = []
     for i in range(len(pars)):
@@ -62,9 +62,9 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
         d0=1.2
         O_cpar_plot(axs[-1,0], F_ave, F_err, O_label, "F", r"$\left<F\right>$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[0,0], E_ave, E_err, O_label, "E", r"$\left<E\right>$",
+    O_cpar_plot(axs[0,0], E_ave, E_err, O_label, "E", r"$E$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[1,0], Le_ave, Le_err, O_label, "Le", r"$\left<\int ds\right>$",cpar, colors, alphas)
+    O_cpar_plot(axs[1,0], Le_ave, Le_err, O_label, "Le", r"$\int ds$",cpar, colors, alphas)
     if Ne==2:
         Le_ave_diff = np.abs(Les_ave[1]-Les_ave[0])
         Le_err_diff = np.sqrt(np.power(Les_err[1],2)+np.power(Les_err[0],2))
@@ -75,17 +75,17 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
         O_cpar_plot(axs[4,1], Ledif_ave/Le_ave, Ledif_ave*0, O_label, "Le_diff/Le_ave'", r"$\left<|\int_0 ds-\int_1 ds|\right>/sum$",cpar, colors, alphas)
         axs[4,1].set_xlabel(xLabel)
 
-    O_cpar_plot(axs[2,0], IdA_ave, IdA_err, O_label, "IdA", r"$\left<\int dA\right>$",cpar, colors, alphas)
-    O_cpar_plot(axs[3,0], I2H_ave, I2H_err, O_label, "I2H", r"$\left<\int dA (2H)\right>$",cpar, colors, alphas)
+    O_cpar_plot(axs[2,0], IdA_ave, IdA_err, O_label, "IdA", r"$\int dA$",cpar, colors, alphas)
+    O_cpar_plot(axs[3,0], I2H_ave, I2H_err, O_label, "I2H", r"$\int dA (2H)$",cpar, colors, alphas)
 
-    O_cpar_plot(axs[4,0], I2H2_ave/(16*np.pi), I2H2_err/(16*np.pi), O_label, "I2H2", r"$\left<\int dA (2H)^2\right>/(16\pi)$",
+    O_cpar_plot(axs[4,0], I2H2_ave/(16*np.pi), I2H2_err/(16*np.pi), O_label, "I2H2", r"$\int dA (2H)^2/(16\pi)$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[5,0], IK_ave, IK_err, O_label, "IK", r"$\left<\int dA K\right>$",cpar, colors, alphas)
-    O_cpar_plot(axs[6,0], ss2_ave, ss2_err, O_label, "ss2", r"$\left<\frac{\sum_{(i,j)} (u_i\cdot u_j)^2}{\#(i,j)}\right>$",
+    O_cpar_plot(axs[5,0], IK_ave, IK_err, O_label, "IK", r"$\int dA K$",cpar, colors, alphas)
+    O_cpar_plot(axs[6,0], ss2_ave, ss2_err, O_label, "ss2", r"$\left<1.5 (u_i\cdot u_j)^2-0.5\right>_{(i,j)}$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[7,0], uuc_ave, uuc_err, O_label, "uuc", r"$\left<\frac{\sum_{(i,j)}(u_i\times u_j)\cdot\hat{r}_{ij} (u_i\cdot u_j)}{\#(i,j)}\right>$",
+    O_cpar_plot(axs[7,0], uuc_ave, uuc_err, O_label, "uuc", r"$\left<(u_i\times u_j)\cdot\hat{r}_{ij} (u_i\cdot u_j)\right>_{(i,j)}$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[8,0], Tun2_ave, Tun2_err, O_label, "Tun2", r"$\sum_{i}(u_i\cdot n_i)^2$",cpar, colors, alphas)
+    O_cpar_plot(axs[8,0], un2_ave, un2_err, O_label, "un2", r"$\left<(u_i\cdot n_i)^2\right>_{i}$",cpar, colors, alphas)
     O_cpar_plot(axs[9,0], IKun2_ave, IKun2_err, O_label, "IKun2", r"$\left<\int dA K (u_i\cdot n_i)\right>$",cpar, colors, alphas)
     #O_cpar_plot(axs[9,0], Itau2_ave, Itau2_err, O_label, "Itau2", r"$\left<\int ds \tau^2\right>$",cpar, colors, alphas)
     axs[8,0].set_xlabel(xLabel)

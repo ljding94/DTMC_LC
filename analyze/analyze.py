@@ -27,6 +27,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
     IKun2_ave, IKun2_tau, IKun2_err = [], [], []
     p2uu_ave, p2uu_tau, p2uu_err = [], [], []
     uuc_ave, uuc_tau, uuc_err = [], [], []
+    un2_ave,un2_tau,un2_err = [],[],[]
     if(Ne==2):
         Ledif_ave,Ledif_tau,Ledif_err=[],[],[]
     cpar_ind = find_cpar_ind(par_nm,mode)
@@ -45,6 +46,12 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         IdA,I2H,I2H2,IK,Tp2uu,Tuuc,Bond_num,Tun2,IKun2 = data[1+Ne:]
         p2uu = Tp2uu/Bond_num
         uuc = Tuuc/Bond_num
+        # N in file name is not real N
+        N =par[find_cpar_ind(par_nm,"N")]
+        Ndict={200:187,400:367,800:721,1000:823,1600:1459}
+        if(par[find_cpar_ind(par_nm,"L")]==-1):
+            N=Ndict[N]
+        un2=Tun2/N
         # Ne2 case, need Ledif for additional info
         if(Ne==2):
             Ledif = np.abs(Les[0]-Les[1])
@@ -53,6 +60,18 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
             tau, tau_err = tau_int_cal_rho(rho,tau_c)
             Ledif_tau.append(tau)
             Ledif_err.append(np.sqrt(2 * tau / len(Ledif) * cov0))
+
+        print("energy slicing E",E)
+        print("Les[0]",Les[0])
+        Et = E-par[find_cpar_ind(par_nm,"lam")]*Les[0]
+        print("E-lam*L",Et)
+        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*Tp2uu
+        print("E-lam*L+Kd*Tp2uu",Et)
+        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")][i]*Tuuc
+        print("E-lam*L+Kd*Tp2uu+Kd*q*Tuuc",Et)
+        Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")]*(Tun2-N)
+        print("E-lam*L+Kd*Tp2uu+Kd*q*Tuuc+0.5Cn*(Tun2-N)",Et)
+
 
         # E
         E_ave.append(np.average(E))
@@ -118,13 +137,23 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         uuc_tau.append(tau)
         uuc_err.append(np.sqrt(2 * tau / len(uuc) * cov0))
 
+        # un2
+        un2_ave.append(np.average(un2))
+        rho, cov0 = autocorrelation_function_fft(un2)
+        tau, tau_err = tau_int_cal_rho(rho,tau_c)
+        # autocorrelation_plot(rho, tau, file2read[:-4] + "_autoun2.pdf")
+        un2_tau.append(tau)
+        un2_err.append(np.sqrt(2 * tau / len(un2) * cov0))
+
         # Tun2
+        '''
         Tun2_ave.append(np.average(Tun2))
         rho, cov0 = autocorrelation_function_fft(Tun2)
         tau, tau_err = tau_int_cal_rho(rho,tau_c)
         # autocorrelation_plot(rho, tau, file2read[:-4] + "_autoTun2.pdf")
         Tun2_tau.append(tau)
         Tun2_err.append(np.sqrt(2 * tau / len(Tun2) * cov0))
+        '''
 
         # IKun2
         IKun2_ave.append(np.average(IKun2))
@@ -150,7 +179,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         f.write(mode+",E_ave,E_tau,E_err")
         for e in range(Ne):
             f.write(",Les_ave[%d],Les_tau[%d],Les_err[%d]"%(e,e,e))
-        f.write(",IdA_ave,IdA_tau,IdA_err,I2H_ave,I2H_tau,I2H_err,I2H2_ave,I2H2_tau,I2H2_err,IK_ave,IK_tau,IK_err,p2uu_ave,p2uu_tau,p2uu_err,uuc_ave,uuc_tau,uuc_err,Tun2_ave,Tun2_tau,Tun2_err,IKun2_ave,IKun2_tau,IKun2_err")
+        f.write(",IdA_ave,IdA_tau,IdA_err,I2H_ave,I2H_tau,I2H_err,I2H2_ave,I2H2_tau,I2H2_err,IK_ave,IK_tau,IK_err,p2uu_ave,p2uu_tau,p2uu_err,uuc_ave,uuc_tau,uuc_err,un2_ave,un2_tau,un2_err,IKun2_ave,IKun2_tau,IKun2_err")
         if(Ne==2):
             f.write(",Ledif_ave,Ledif_tau,Ledif_err")
         f.write("\n")
@@ -158,7 +187,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
             f.write("%f,%f,%f,%f" % (cpar[i], E_ave[i], E_tau[i], E_err[i]))
             for e in range(Ne):
                 f.write(",%f,%f,%f"%(Les_ave[e][i],Les_tau[e][i], Les_err[e][i]))
-            f.write(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f"%(IdA_ave[i], IdA_tau[i], IdA_err[i],I2H_ave[i], I2H_tau[i], I2H_err[i],I2H2_ave[i], I2H2_tau[i], I2H2_err[i], IK_ave[i], IK_tau[i], IK_err[i], p2uu_ave[i], p2uu_tau[i], p2uu_err[i], uuc_ave[i], uuc_tau[i], uuc_err[i], Tun2_ave[i], Tun2_tau[i], Tun2_err[i],IKun2_ave[i],IKun2_tau[i],IKun2_err[i]))
+            f.write(",%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f"%(IdA_ave[i], IdA_tau[i], IdA_err[i],I2H_ave[i], I2H_tau[i], I2H_err[i],I2H2_ave[i], I2H2_tau[i], I2H2_err[i], IK_ave[i], IK_tau[i], IK_err[i], p2uu_ave[i], p2uu_tau[i], p2uu_err[i], uuc_ave[i], uuc_tau[i], uuc_err[i], un2_ave[i], un2_tau[i], un2_err[i],IKun2_ave[i],IKun2_tau[i],IKun2_err[i]))
             if(Ne==2):
                 f.write(",%f,%f,%f"%(Ledif_ave[i], Ledif_tau[i], Ledif_err[i]))
             f.write("\n")
@@ -298,8 +327,6 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         popt,popterr = odr_lamp_popt(rplot[fi:],tan_half[fi:],rperr[fi:],tan_halferr[fi:])
         print("odr fit",popt,popterr)
 
-
-
         rp=rplot[fi:]
         if(i in leg_ind):
             axs[1,0].errorbar(rplot,tan_half-popt[2],yerr=tan_halferr,linestyle="None",marker="o",mfc="None",ms=3)
@@ -344,7 +371,7 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
     axs[1,1].set_xlabel(mode)
     if(mode=="Cn"):
         axs[1,1].set_xlabel(r"$C_n$")
-
+    axs[1,1].set_ylim(0.0,0.5)
     fig.suptitle(tag)
     plt.tight_layout()
     #plt.show()

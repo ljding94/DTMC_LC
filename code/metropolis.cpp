@@ -21,6 +21,7 @@ int dtmc_lc::bead_metropolis(double delta_s)
 
     // some useful cache variables
     int index, nei_ind;
+    std::pair<int, int> bond;
     std::vector<double> delta_pos{0, 0, 0};
     double distance2_cache, uuc_cache; // some cache
 #pragma endregion
@@ -37,12 +38,15 @@ int dtmc_lc::bead_metropolis(double delta_s)
     bond_relate.clear();
     ind_relate.push_back(index);
     bead_relate.push_back(mesh[index]);
+    bond.first = index;
     for (int j = 0; j < mesh[index].nei.size(); j++)
     {
         nei_ind = mesh[index].nei[j];
 
         ind_relate.push_back(nei_ind);
         bead_relate.push_back(mesh[nei_ind]);
+        bond.second = nei_ind;
+        bond_relate.push_back(bond);
     }
 
 #pragma endregion
@@ -54,7 +58,7 @@ int dtmc_lc::bead_metropolis(double delta_s)
 #pragma endregion
 
 #pragma region : bead MC update proposal
-    for (int k = 0; k < 3; k++)
+    for (int k = 0; k < 2; k++)
     {
         delta_pos[k] = 2 * delta_s * rand_uni(gen) - delta_s;
         mesh[index].R[k] += delta_pos[k];
