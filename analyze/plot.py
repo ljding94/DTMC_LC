@@ -79,24 +79,29 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
     if(cvt_map=="Mean"):
         ftail+="_mmap"
         heat=dA*d2H
+        print("mean curvature heat",heat)
         for m in range(cmap_smooth):
             heat = mean_filter(heat,ns)
-        #norm=Normalize(vmin=0,vmax=0.5*np.pi)
-        ax_xy.scatter(x,y,c=cmap(heat))
-        ax_zx.scatter(z,x,c=cmap(heat))
-        sm = plt.cm.ScalarMappable(cmap=cmap)
+        norm=Normalize(vmin=0,vmax=0.7)
+        ax_xy.scatter(x,y,c=cmap(norm(heat)))
+        ax_zx.scatter(z,x,c=cmap(norm(heat)))
+        sm = plt.cm.ScalarMappable(cmap=cmap,norm=norm)
         sm.set_array([])
-        cbar=plt.colorbar(sm)
+        cbar=plt.colorbar(sm, ticks=[0,0.5,0.7])
+        cbar.ax.set_yticklabels(["0","0.5","0.7"])
     elif(cvt_map=="Gaussian"):
         ftail+="_gmap"
         heat = dAK
+        print("Gaussian curvature heat",heat)
         for m in range(cmap_smooth):
             heat = mean_filter(heat,ns)
-        ax_xy.scatter(x,y,c=cmap(dAK))
-        ax_zx.scatter(z,x,c=cmap(dAK))
-        sm = plt.cm.ScalarMappable(cmap=cmap)
+        norm=Normalize(vmin=-0.1,vmax=0.0)
+        ax_xy.scatter(x,y,c=cmap(norm(heat)))
+        ax_zx.scatter(z,x,c=cmap(norm(heat)))
+        sm = plt.cm.ScalarMappable(cmap=cmap,norm=norm)
         sm.set_array([])
-        cbar=plt.colorbar(sm)
+        cbar=plt.colorbar(sm, ticks=[-0.1,-0.05,0])
+        cbar.ax.set_yticklabels(["-0.1","-0.05","0"])
     # edge bond
     ecolors = ["blue","purple","green"]
     for i in range(len(ens)):
@@ -223,7 +228,17 @@ def config_plot3D(filename,mesh=0,rod=0,cvt_map="",cmap_smooth=0):
     #plt.savefig(filename[:-4] + "_3D.png", dpi=300)
     plt.close()
 
-
+def config_nu2_dis(filename,bin_num=20):
+    ftail = "_dis"
+    data = np.loadtxt(filename, skiprows=6, delimiter=",", unpack=True)
+    x,y,z,sx,sy,sz,dA,d2H,ds,dAK,un2,enum, en0, en1 = data[:14]
+    fig = plt.figure(figsize=(10, 5))
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
+    ax1.hist(un2,bins=bin_num,histtype="step",density=True)
+    ax1.hist(dA*d2H*d2H,bins=bin_num,histtype="step",density=True)
+    ax2.scatter(un2,dA*d2H*d2H)
+    plt.show()
 
 def autocorrelation_plot(rho,tau_int,savefile):
     t = np.linspace(0,1000,1000)

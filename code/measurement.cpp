@@ -740,7 +740,7 @@ std::vector<double> dtmc_lc::unu2r_m(int bin_num)
     r_c2e_std = std::sqrt(r2_c2e - r_c2e * r_c2e);
     del_r = r_c2e / bin_num;
 
-    // find largest eigen value and corresponding eigenvector
+    // find largest eigenvalue and corresponding eigenvector
     for (int i = 0; i < N; i++)
     {
         bead_list.push_back(i);
@@ -861,6 +861,29 @@ std::vector<double> dtmc_lc::nunu2lcov_m(int bin_num)
         nunu2lcov[b] /= (bin_num - b);
     }
     return nunu2lcov;
+}
+
+std::vector<double> dtmc_lc::un2dis_m(int bin_num)
+{
+    std::vector<double> un2dis;
+    double del_un2 = 1.0 / bin_num;
+    double un2_increment = 1.0 / mesh.size();
+    int bin;
+    for (int k = 0; k < bin_num; k++)
+    {
+        un2dis.push_back(0);
+    }
+
+    for (int i = 0; i < mesh.size(); i++)
+    {
+        bin = int(mesh[i].un2 / del_un2);
+        if (bin >= bin_num)
+        {
+            std::cout << "out of range for un2dis bin_num\n";
+        }
+        un2dis[bin] += un2_increment;
+    }
+    return un2dis;
 }
 
 #pragma endregion

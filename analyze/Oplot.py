@@ -43,7 +43,10 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
     Le_err = np.sqrt(np.sum(np.power(Les_err,2),axis=0))
     IdA_ave, IdA_tau, IdA_err,I2H_ave, I2H_tau, I2H_err,I2H2_ave, I2H2_tau, I2H2_err, IK_ave, IK_tau, IK_err, ss2_ave, ss2_tau, ss2_err,uuc_ave, uuc_tau, uuc_err, un2_ave, un2_tau, un2_err, IKun2_ave,IKun2_tau,IKun2_err = data[7+3*(Ne-1):31+3*(Ne-1)]
     F_ave,F_err=[],[]
+    uuc_grad,uuc_grad_err = [],[]
+    un2_grad,un2_grad_err = [],[]
     cpar_tsqN = []
+    #some special cases
     for i in range(len(pars)):
         if(mode=="L"):
             d0=1.5
@@ -51,6 +54,11 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
             fa,fe = Chi2_gradient(d0*cpar[i],E_ave[i],E_err[i],4)
             F_ave.append(fa)
             F_err.append(fe)
+        if(mode=="q"):
+            uuc_grad.append(np.gradient(uuc_ave[i],cpar[i]))
+            uuc_grad_err.append(np.zeros(len(cpar[i])))
+            un2_grad.append(np.gradient(un2_ave[i],cpar[i]))
+            un2_grad_err.append(np.zeros(len(cpar[i])))
     ppi = 72
     # LineWidth, FontSize, LabelSize = 1, 9, 8
     plt.figure()
@@ -83,9 +91,12 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
     O_cpar_plot(axs[5,0], IK_ave, IK_err, O_label, "IK", r"$\int dA K$",cpar, colors, alphas)
     O_cpar_plot(axs[6,0], ss2_ave, ss2_err, O_label, "ss2", r"$\left<1.5 (u_i\cdot u_j)^2-0.5\right>_{(i,j)}$",
                 cpar, colors, alphas)
-    O_cpar_plot(axs[7,0], uuc_ave, uuc_err, O_label, "uuc", r"$\left<(u_i\times u_j)\cdot\hat{r}_{ij} (u_i\cdot u_j)\right>_{(i,j)}$",
-                cpar, colors, alphas)
-    O_cpar_plot(axs[8,0], un2_ave, un2_err, O_label, "un2", r"$\left<(u_i\cdot n_i)^2\right>_{i}$",cpar, colors, alphas)
+    O_cpar_plot(axs[7,0], uuc_ave, uuc_err, O_label, "uuc", r"$u_c=\left<(u_i\times u_j)\cdot\hat{r}_{ij} (u_i\cdot u_j)\right>_{(i,j)}$",cpar, colors, alphas)
+    #plot the differential if mode is q
+    O_cpar_plot(axs[8,0], un2_ave, un2_err, O_label, "un2", r"$u_n=\left<(u_i\cdot n_i)^2\right>_{i}$",cpar, colors, alphas)
+    if(mode=="q"):
+        O_cpar_plot(axs[7,1], uuc_grad, uuc_grad_err, O_label, "uuc_grad", r"$\partial u_c /\partial q$",cpar, colors, alphas)
+        O_cpar_plot(axs[8,1], un2_grad, un2_grad_err, O_label, "un2_grad", r"$\partial u_n /\partial q$",cpar, colors, alphas)
     O_cpar_plot(axs[9,0], IKun2_ave, IKun2_err, O_label, "IKun2", r"$\left<\int dA K (u_i\cdot n_i)\right>$",cpar, colors, alphas)
     #O_cpar_plot(axs[9,0], Itau2_ave, Itau2_err, O_label, "Itau2", r"$\left<\int ds \tau^2\right>$",cpar, colors, alphas)
     axs[8,0].set_xlabel(xLabel)

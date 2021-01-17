@@ -184,7 +184,7 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
 void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                            double delta_s, double delta_theta,
                            std::string folder, std::string finfo,
-                           int bin_num_r)
+                           int bin_num_r, int bin_num_un2)
 {
     std::vector<double> E_all;
     std::vector<double> I2H2_all;
@@ -201,6 +201,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
 
     std::vector<std::vector<double>> Gij_all;
     std::vector<std::vector<double>> un2r_all;
+    std::vector<std::vector<double>> un2dis_all;
     std::vector<std::vector<double>> unu2r_all;
     std::vector<std::vector<double>> nu0nu2l_all;
     std::vector<std::vector<double>> nunu2lcov_all;
@@ -254,8 +255,16 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
             }
             else
             {
-                un2r_all.push_back(un2r_m(bin_num_r));
-                unu2r_all.push_back(unu2r_m(bin_num_r));
+                if (bin_num_un2 != 0)
+                {
+                    un2r_all.push_back(un2r_m(bin_num_r));
+                }
+                if (bin_num_un2 != 0)
+                {
+                    un2dis_all.push_back(un2dis_m(bin_num_un2));
+                }
+                // don't waste time doing the measurement if it's not to be used
+                //unu2r_all.push_back(unu2r_m(bin_num_r));
             }
         }
     }
@@ -341,23 +350,45 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     }
     else
     {
-        std::ofstream f_un2r(folder + "/un2r_MC_" + finfo + ".txt");
-        // std::ofstream f_unu2r(folder + "/unu2r_MC_" + finfo + ".txt");
-        if (f_un2r.is_open())
+        if (bin_num_r != 0)
         {
-            f_un2r << "bin_num=" << bin_num_r << "\n";
-            f_un2r << "r, r_std,(u*n_u)^2(r)\n";
-            for (int i = 0; i < un2r_all.size(); i++)
+            std::ofstream f_un2r(folder + "/un2r_MC_" + finfo + ".txt");
+            // std::ofstream f_unu2r(folder + "/unu2r_MC_" + finfo + ".txt");
+            if (f_un2r.is_open())
             {
-                f_un2r << un2r_all[i][0];
-                for (int j = 1; j < un2r_all[i].size(); j++)
+                f_un2r << "bin_num=" << bin_num_r << "\n";
+                f_un2r << "r, r_std,(u*n_u)^2(r)\n";
+                for (int i = 0; i < un2r_all.size(); i++)
                 {
-                    f_un2r << "," << un2r_all[i][j];
+                    f_un2r << un2r_all[i][0];
+                    for (int j = 1; j < un2r_all[i].size(); j++)
+                    {
+                        f_un2r << "," << un2r_all[i][j];
+                    }
+                    f_un2r << "\n";
                 }
-                f_un2r << "\n";
+            }
+            f_un2r.close();
+        }
+        if (bin_num_un2 != 0)
+        {
+            std::ofstream f_un2dis(folder + "/un2dis_MC_" + finfo + ".txt");
+            if (f_un2dis.is_open())
+            {
+                f_un2dis << "bin_num=" << bin_num_un2 << "\n";
+                f_un2dis << "un2 density/ un2*bin_num_un2\n";
+                for (int i = 0; i < un2dis_all.size(); i++)
+                {
+                    f_un2dis << un2dis_all[i][0];
+                    for (int j = 1; j < un2dis_all[i].size(); j++)
+                    {
+                        f_un2dis << "," << un2dis_all[i][j];
+                    }
+                    f_un2dis << "\n";
+                }
+                f_un2dis.close();
             }
         }
-        f_un2r.close();
         /*
         if (f_unu2r.is_open()) {
             f_unu2r << "bin_num=" << bin_num_r << "\n";

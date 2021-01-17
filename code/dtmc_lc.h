@@ -140,6 +140,8 @@ public:
 
     std::vector<double> unu2r_m(int bin_num);
     // (u(r)*nu)^2, how mush director twist about membrane nematic director
+    std::vector<double> un2dis_m(int bin_num);
+    // distribution of un2 among beads, good indication for pi wall formation
     std::vector<double> nu0nu2l_m(int bin_num);
     //(nu * nu(l))^2, how each slab nematic director
     std::vector<double> nunu2lcov_m(int bin_num);
@@ -187,7 +189,7 @@ public:
     // thermalisation of the system, starting from beta=0 (hot start)
     void O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                       double delta_s, double delta_theta, std::string folder,
-                      std::string finfo, int bin_num_r);
+                      std::string finfo, int bin_num_r, int bin_num_un2);
     // measure the obserables
     // energy versus lambda curve testing
 

@@ -10,15 +10,12 @@ from analyze import *
 def main():
     print("hello! dtmc_lc analysis")
     #config_plot_xyz("../data/scratch_local/State_N200_Ne1_L0_kar20_karg10.0_lam4.0_Kd4.0_q1.0_Cn6.0_kard0.0_init.txt",mesh=1,rod=0)
-    #config_plot_xyz("../data/Ne1/Jan1_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam6.0_Kd4.0_q1.2_Cn4.0_kard0.0.txt",mesh=0,rod=1,cvt_map="")
-    #config_plot3D("../data/Ne1/Jan1_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam6.0_Kd4.0_q1.2_Cn4.0_kard0.0.txt",mesh=0,rod=1,cvt_map="")
-    #config_plot3D("../data/Ne1/Jan3_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam6.0_Kd8.0_q3.5_Cn8.0_kard0.0.txt",mesh=0,rod=0,cvt_map="Mean",cmap_smooth=1)
-    #config_plot3D("../data/Ne1/Jan3_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam6.0_Kd8.0_q3.5_Cn8.0_kard0.0.txt",mesh=0,rod=0,cvt_map="Mean",cmap_smooth=2)
-    #config_plot3D("../data/Ne1/Jan3_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam6.0_Kd8.0_q3.5_Cn8.0_kard0.0.txt",mesh=0,rod=0,cvt_map="Mean",cmap_smooth=3)
-    #config_plot3D("../data/scratch_local/State_N200_Ne1_L-1_kar100_karg20_lam3.0_Kd0.0_q0.0_Cn0.0_kard0.0.txt",mesh=0,rod=1)
-    #return 0
+    #config_nu2_dis("../data/Ne1/Jan14_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam5.0_Kd5.0_q1.0_Cn5.0_kard0.0.txt")
+    config_nu2_dis("../data/Ne1/Jan14_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam5.0_Kd5.0_q0.4_Cn5.0_kard0.0.txt",bin_num=50)
+    config_nu2_dis("../data/Ne1/Jan14_2021/State_N1000_Ne1_L-1_kar15_karg0.0_lam5.0_Kd5.0_q2.4_Cn5.0_kard0.0.txt",bin_num=50)
+    return 0
 
-    foldername = "../data/Ne1/Jan8_2021"
+    foldername = "../data/Ne1/Jan14_2021"
     print("analyzing "+foldername)
     pars = []
     colors = []
@@ -37,12 +34,12 @@ def main():
     karg=0.0
     lams = np.arange(3.0,7.1,0.5)
     lam=5.0
-    Kds = np.arange(4.0,16.1,4.0)
-    Kd=16.0
-    qs=np.arange(0.2,4.1,0.2)
-    q=1.0
-    Cns=np.arange(0.0,12.1,4.0)
-    Cn=10.0
+    Kds = np.arange(3.0,15.1,2.0)
+    Kd=9.0
+    qs=np.arange(0.0,3.1,0.2)
+    q=0.8
+    Cns=np.arange(1.0,9.1,2.0)
+    Cn=6.0
     kards=np.arange(1.0,5.1,1.0)
     kard=0.0
     Ne1pars = []
@@ -63,11 +60,11 @@ def main():
             #pass
             #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=1,bin_num=60)
 
-        for q in qs[::4]:
+        for q in qs[::1]:
             if(i%1==0):
                 filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_karg%.1f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kard%.1f.txt" % (N, Ne, L, kar,karg,lam,Kd,q,Cn, kard)
-                config_plot_xyz(filename, mesh=0,rod=1,tag=r"$K_d=%.1f,q=%.1f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
-                #config_plot_xyz(filename, mesh=0,rod=0,cvt_map="Mean",cmap_smooth=1,tag=r"$\bar{\kappa}=%.1f,\lambda=%.1f,C_n=%.1f$" % (karg,lam,Cn),Format="png")
+                #config_plot_xyz(filename, mesh=0,rod=1,tag=r"$K_d=%.1f,q=%.1f,C_n=%.1f$" % (Kd,q,Cn),Format="png")
+                #config_plot_xyz(filename, mesh=0,rod=0,cvt_map="Mean",cmap_smooth=3,tag=r"$\bar{\kappa}=%.1f,\lambda=%.1f,C_n=%.1f$" % (karg,lam,Cn),Format="png")
                 #config_plot_xyz(filename, mesh=0,rod=0,cvt_map="Gaussian",tag=r"$\bar{\kappa}=%.1f,\lambda=%.1f,C_n=%.1f$" % (karg,lam,Cn),Format="png")
 
         #print("sleeping...")
