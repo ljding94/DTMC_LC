@@ -304,7 +304,6 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
     O_cpar_plot(axs[2,0],r_std,r_std_err,O_label,"r_std",r"$\delta\overline{r}$",cpar,None,None,Ms=3)
 
     # fit data (exponent) if cpar is Cn
-
     if(mode=="Cn"):
         None_label=["" for i in range(len(cpar))]
         Kd=np.array(Kd)
@@ -325,6 +324,7 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
         chi2nu = chi2/(len(cpar_pKd_all)-1)
         p =1 - stats.chi2.cdf(chi2, df=len(cpar_pKd_all)-1)
         print(p,1 - stats.chi2.cdf(chi2nu*(len(cpar_pKd_all)-1), (len(cpar_pKd_all)-1)))
+        print("popt",popt)
         axs[0,1].plot(cpar_plt,sqrt_fit_neg(cpar_plt,*popt),alpha=0.8,label=r"$\lambda_p=%.2f/\sqrt{\frac{C_n}{K_d}}$"%popt[0])
         #axs[0,1].fill_between(cpar_plt,sqrt_fit_neg(cpar_plt,*popt-popterr),sqrt_fit_neg(cpar_plt,*popt+popterr),alpha=0.4,label=r"$\lambda_p=%.2f/\sqrt{\frac{C_n}{K_d}}$"%popt[0])
         axs[0,1].legend()
@@ -390,7 +390,6 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
         axs[3,1].set_yscale("log")
         axs[3,1].set_xlabel(r"$C_n/K_d$")
 
-
     elif(mode=="Kd"):
         Cn=np.array(Cn)
         cpar_pCn=cpar/Cn[:,np.newaxis]
@@ -409,9 +408,46 @@ def lamp_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
         axs[1,1].set_xlabel(r"$K_d/C_n$")
     axs[1,0].set_xlabel(xLabel)
     lgd = axs[0,0].legend(loc="upper center",bbox_to_anchor=(0.5, 0.75 * len(axs)))
-    plt.tight_layout(pad=0)
+    plt.tight_layout(pad=0.5)
     plt.savefig(foldername + "/O"+head+"_" + mode + ".pdf",
                 format="pdf", bbox_extra_artists=(lgd,), bbox_inches='tight', transparent=True)
+    plt.close()
+
+def un2below_pars_plot(foldername,pars,par_nm,par_dg,mode,head):
+    print("plotting un2below stats versus par (q?)")
+    xLabel = mode #let's say it's q
+    cpar_ind = find_cpar_ind(par_nm,mode)
+    data,O_label = [],[]
+    for i in range(len(pars)):
+        par = pars[i]
+        par_dealing = par[:]
+        f2rtail = "MC"
+        label = ""
+        for j in range(len(par)):
+            if(j==cpar_ind):
+                f2rtail+="_"+par_nm[j]+"s"
+            else:
+                f2rtail+="_"+par_nm[j]+"%.*f"%(par_dg[j],par_dealing[j])
+                label +=par_nm[j]+"%.*f,"%(par_dg[j],par_dealing[j])
+        f2rtail+="_ana.txt"
+        filename = foldername +"/"+ head+"_"+f2rtail
+        data.append(np.loadtxt(filename, skiprows=1,delimiter=",", unpack=True))
+        O_label.append(label)
+    data = np.transpose(np.array(data), axes=(1, 0, 2))
+    cpar,un2below,un2below_err=data
+
+    # plot it
+    ppi = 72
+    plt.figure()
+    plt.rc('text', usetex=True)
+    fig, ax = plt.subplots(1, 1, figsize=(
+        246 / ppi*1, 246 / ppi*1.5*0.8))
+    # original data
+    O_cpar_plot(ax,un2below,un2below_err,O_label,"un2below",r"$P(un2<1/2)$",cpar,None,None,Ms=3)
+    ax.set_xlabel(xLabel)
+    ax.legend(loc="upper center",bbox_to_anchor=(0.5, 1.75))
+    plt.tight_layout(pad=0.5)
+    plt.savefig(foldername + "/O"+head+"_" + mode + ".pdf",format="pdf")
     plt.close()
 
 

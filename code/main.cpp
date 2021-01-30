@@ -46,7 +46,8 @@ int main(int argc, char const *argv[])
     Kt = q * Kd;
     // will skip bin measurement if set to 0;
     int bin_num_r = 0;
-    int bin_num_un2 = 50; //un2 distribution among beads
+    int bin_num_un2 = 0; //un2 distribution among beads
+    int bin_num_l = 50;
     bool fix_bead_on = 0;
     if (L == -1)
     {
@@ -96,7 +97,7 @@ int main(int argc, char const *argv[])
         membrane.State_write(folder + "/State_" + finfo + "_init.txt");
         membrane.Thermal(0, int(N / (delta_s * delta_s)) + 1, 2, delta_s, delta_theta);
         // membrane.O_MC_measure(5, 1, int(N / (ds * ds)) + 1, ds,
-        membrane.O_MC_measure(40, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r, bin_num_un2);
+        membrane.O_MC_measure(40, 10, int(N / (delta_s * delta_s)) + 1, delta_s, delta_theta, folder, finfo, bin_num_r, bin_num_un2, bin_num_l);
         // membrane.O_MC_measure(2, 1, 0, delta_s, delta_theta, folder,
         // finfo,bin_num_r);
         membrane.State_write(folder + "/State_" + finfo + ".txt");
@@ -123,7 +124,7 @@ int main(int argc, char const *argv[])
         membrane.Thermal(1000, N / (delta_s * delta_s), 1, delta_s,
                          delta_theta);
         membrane.O_MC_measure(2000, 50, N / (delta_s * delta_s) + 1, delta_s,
-                              delta_theta, folder, finfo, bin_num_r, bin_num_un2);
+                              delta_theta, folder, finfo, bin_num_r, bin_num_un2, bin_num_l);
         membrane.State_write(folder + "/State_" + finfo + ".txt");
 
         return 0;

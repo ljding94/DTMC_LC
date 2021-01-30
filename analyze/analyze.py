@@ -48,7 +48,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         uuc = Tuuc/Bond_num
         # N in file name is not real N
         N =par[find_cpar_ind(par_nm,"N")]
-        Ndict={200:187,400:367,800:721,1000:823,1600:1459}
+        Ndict={200:187,400:367,500:439,800:721,1000:823,1600:1459}
         if(par[find_cpar_ind(par_nm,"L")]==-1):
             N=Ndict[N]
         un2=Tun2/N
@@ -70,9 +70,9 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         print("E-0.5kar*I2H2-lam*L",Et)
         Et=Et+par[find_cpar_ind(par_nm,"Kd")]*Tp2uu
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu",Et)
-        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")][i]*Tuuc
+        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")]*Tuuc
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc",Et)
-        Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")]*(Tun2-N)
+        Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")][i]*(Tun2-N)
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc+0.5Cn*(Tun2-N)",Et)
 
 
@@ -253,7 +253,7 @@ def odr_lamp_popt(xdata,ydata,xerr,yerr):
     #output.pprint()
     return (output.beta,output.sd_beta)
 
-def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",leg_num=5,bin_num=40):
+def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",leg_num=5):
     Ne = par[find_cpar_ind(par_nm,"Ne")]
     cpar_ind = find_cpar_ind(par_nm,mode)
     cpar = par[cpar_ind]
@@ -274,7 +274,7 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         # analyze unu2
         unu2r_all.append(np.average(data[2:],axis=1))
         unu2rerr_all.append(np.std(data[2:],axis=1)/np.sqrt(len(data[1])))
-
+        bin_num = len(data[2:])
 
         # analyze average edge to center distance
         r_ave.append(np.average(r))
@@ -309,6 +309,7 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
 
     for i in range(len(cpar)):
         pass
+        print("cpar[i]",cpar[i])
         Linestyle=":"
         Label=None
         if(i in leg_ind):
@@ -326,7 +327,6 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
         popt,pcov=curve_fit(tan_fit,rplot[fi:],tan_half[fi:],bounds=(0, [1., 1., 0.5]),sigma=tan_halferr[fi:],absolute_sigma=True)
         popterr = np.diag(pcov)**0.5
         print("curve_fit",popt,popterr)
-        print("try odr fit")
         popt,popterr = odr_lamp_popt(rplot[fi:],tan_half[fi:],rperr[fi:],tan_halferr[fi:])
         print("odr fit",popt,popterr)
 
@@ -337,6 +337,8 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
 
         #print("popt,popterr",popt,popterr)
         lamp.append(popt[1])
+        if(popterr[1]>1):
+            print("popterr[1]",popterr[1])
         lamperr.append(popterr[1])
 
     #record penetration depth data
@@ -356,6 +358,7 @@ def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",le
 
     #axs[1,0].plot([rplot[int(bin_num/3)],rplot[int(bin_num/3)]],[0,1],"--k")
     axs[0,0].set_ylabel(r"$\cos^2{\theta(r/\overline{r})}$")
+    axs[0,0].set_ylim(0.0,1.0)
     axs[1,0].set_ylabel(r"$\tan(\theta(r/\overline{r})/2)$")
     axs[1,0].set_yscale("log")
     axs[1,0].set_xlabel(r"$r/\overline{r}$")
@@ -486,3 +489,72 @@ def twistl_stat_plot(foldername, par, par_nm, par_dg, mode, d0=1.5, head="nunu2l
     plt.savefig(savefile[:-4]+".pdf",format="pdf")
     #plt.show()
     plt.close()
+
+def un2dis_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2dis",tag="",leg_num=5):
+
+    Ne = par[find_cpar_ind(par_nm,"Ne")]
+    cpar_ind = find_cpar_ind(par_nm,mode)
+    cpar = par[cpar_ind]
+    un2dis_all = []
+    un2below_ave,un2below_tau,un2below_err = [],[],[]
+    for i in range(len(cpar)):
+        par_dealing = par[:]
+        par_dealing[cpar_ind] = par[cpar_ind][i]
+        f2rtail = "MC"
+        for j in range(len(par_dealing)):
+            f2rtail+="_"+par_nm[j]+"%.*f"%(par_dg[j],par_dealing[j])
+        f2rtail+=".txt"
+        file2read = foldername + "/"+head+"_"+f2rtail
+        data = np.loadtxt(file2read, skiprows=2, delimiter=",", unpack=True)
+        bin_num = len(data)
+        print("bin_num",bin_num)
+        # analyze unu2
+        un2dis_all.append(np.average(data,axis=1)*bin_num)
+        un2below = np.sum(data[:int(0.5*bin_num)],axis=0)
+        print("un2below",un2below)
+        # get statistic of un2below
+        un2below_ave.append(np.average(un2below))
+        rho, cov0 = autocorrelation_function_fft(un2below)
+        tau, tau_err = tau_int_cal_rho(rho,6)
+        un2below_tau.append(tau)
+        un2below_err.append(np.sqrt(2 * tau / len(un2below) * cov0))
+        #un2dis_all.append(np.std(data[2:],axis=1)/np.sqrt(len(data[1])))
+
+    f2stail = "MC"
+    for j in range(len(par)):
+        if(j==cpar_ind):
+            f2stail+="_"+par_nm[j]+"s"
+        else:
+            f2stail+="_"+par_nm[j]+"%.*f"%(par_dg[j],par_dealing[j])
+    f2stail+="_ana.txt"
+    savefile = foldername +"/"+head+"_" + f2stail
+
+    with open(savefile,"w") as f:
+        f.write(mode+",un2below,un2below_err\n")
+        for i in range(len(cpar)):
+            f.write("%f,%f,%f\n"%(cpar[i],un2below_ave[i],un2below_err[i]))
+
+    if(leg_num>len(cpar)):
+        leg_num=cpar
+    leg_ind = np.linspace(0,len(cpar)-1,leg_num,dtype=np.int)
+    ppi = 72
+    # LineWidth, FontSize, LabelSize = 1, 9, 8
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r"\usepackage{physics}")
+    fig, axs = plt.subplots(1, 1, figsize=(
+        246 / ppi*1, 246 / ppi * 1*0.8))
+    un2_bin = np.linspace(0.5/bin_num,1-0.5/bin_num,bin_num)
+    for i in range(len(cpar)):
+        print("np.shape(un2dis_all[i])",np.shape(un2dis_all[i]))
+        print("np.shape(un2_bin)",np.shape(un2_bin))
+        Linestyle=":"
+        Label=None
+        if(i in leg_ind):
+            Linestyle="-"
+            Label=mode+"=%.*f"%(par_dg[cpar_ind],cpar[i])
+        axs.plot(un2_bin,un2dis_all[i],linestyle=Linestyle,label=Label)
+    axs.set_xlabel(r"$un2=(\hat{u}\cdot \hat{n})^2$")
+    axs.set_ylabel(r"$P(un2)$")
+    axs.legend()
+    plt.tight_layout(pad=0.5)
+    plt.savefig(savefile[:-4]+".pdf",format="pdf")

@@ -184,7 +184,7 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
 void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                            double delta_s, double delta_theta,
                            std::string folder, std::string finfo,
-                           int bin_num_r, int bin_num_un2)
+                           int bin_num_r, int bin_num_un2, int bin_num_l)
 {
     std::vector<double> E_all;
     std::vector<double> I2H2_all;
@@ -248,14 +248,14 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
 
         if (sweep_n % sweep_p_G == 0)
         {
-            if (fix_bead)
+            if (fix_bead && bin_num_l != 0)
             {
-                nu0nu2l_all.push_back(nu0nu2l_m(bin_num_r));
-                nunu2lcov_all.push_back(nunu2lcov_m(bin_num_r));
+                nu0nu2l_all.push_back(nu0nu2l_m(bin_num_l));
+                nunu2lcov_all.push_back(nunu2lcov_m(bin_num_l));
             }
             else
             {
-                if (bin_num_un2 != 0)
+                if (bin_num_r != 0)
                 {
                     un2r_all.push_back(un2r_m(bin_num_r));
                 }
@@ -312,12 +312,12 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     }
     f.close();
 
-    if (fix_bead)
+    if (fix_bead && bin_num_l != 0)
     {
         std::ofstream f_nu0nu2l(folder + "/nu0nu2l_MC_" + finfo + ".txt");
         if (f_nu0nu2l.is_open())
         {
-            f_nu0nu2l << "bin_num=" << bin_num_r << "\n";
+            f_nu0nu2l << "bin_num=" << bin_num_l << "\n";
             f_nu0nu2l << "(n_u(0)*n_u(l))^2\n";
             for (int i = 0; i < nu0nu2l_all.size(); i++)
             {
@@ -334,7 +334,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
         std::ofstream f_nunu2lcov(folder + "/nunu2lcov_MC_" + finfo + ".txt");
         if (f_nunu2lcov.is_open())
         {
-            f_nunu2lcov << "bin_num=" << bin_num_r << "\n";
+            f_nunu2lcov << "bin_num=" << bin_num_l << "\n";
             f_nunu2lcov << "ave_s{(n_u(s)*n_u(s+l))^2}\n";
             for (int i = 0; i < nunu2lcov_all.size(); i++)
             {

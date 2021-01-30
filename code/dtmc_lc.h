@@ -189,7 +189,7 @@ public:
     // thermalisation of the system, starting from beta=0 (hot start)
     void O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                       double delta_s, double delta_theta, std::string folder,
-                      std::string finfo, int bin_num_r, int bin_num_un2);
+                      std::string finfo, int bin_num_r, int bin_num_un2, int bin_num_l);
     // measure the obserables
     // energy versus lambda curve testing
 

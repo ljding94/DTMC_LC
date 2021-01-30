@@ -78,7 +78,7 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
     cmap = cm.get_cmap("jet_r")
     if(cvt_map=="Mean"):
         ftail+="_mmap"
-        heat=dA*d2H
+        heat=dA*d2H*d2H
         print("mean curvature heat",heat)
         for m in range(cmap_smooth):
             heat = mean_filter(heat,ns)
@@ -87,8 +87,9 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
         ax_zx.scatter(z,x,c=cmap(norm(heat)))
         sm = plt.cm.ScalarMappable(cmap=cmap,norm=norm)
         sm.set_array([])
-        cbar=plt.colorbar(sm, ticks=[0,0.5,0.7])
-        cbar.ax.set_yticklabels(["0","0.5","0.7"])
+        cbar=plt.colorbar(sm)
+        #cbar=plt.colorbar(sm, ticks=[0,0.5,0.7])
+        #cbar.ax.set_yticklabels(["0","0.5","0.7"])
     elif(cvt_map=="Gaussian"):
         ftail+="_gmap"
         heat = dAK
@@ -100,8 +101,9 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
         ax_zx.scatter(z,x,c=cmap(norm(heat)))
         sm = plt.cm.ScalarMappable(cmap=cmap,norm=norm)
         sm.set_array([])
-        cbar=plt.colorbar(sm, ticks=[-0.1,-0.05,0])
-        cbar.ax.set_yticklabels(["-0.1","-0.05","0"])
+        cbar=plt.colorbar(sm)
+        #cbar=plt.colorbar(sm, ticks=[-0.1,-0.05,0])
+        #cbar.ax.set_yticklabels(["-0.1","-0.05","0"])
     # edge bond
     ecolors = ["blue","purple","green"]
     for i in range(len(ens)):
