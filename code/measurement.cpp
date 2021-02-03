@@ -886,4 +886,37 @@ std::vector<double> dtmc_lc::un2dis_m(int bin_num)
     return un2dis;
 }
 
+std::vector<double> dtmc_lc::gr_uucgr_m(double dr, int bin_num)
+{
+    std::vector<double> gr_uucgr;
+    std::vector<double> gr;
+    std::vector<double> uucgr;
+    // TODO: implement pair distribution function and related structure function measurement
+    int bin;
+    double r, uuc;
+    for (int i = 0; i < bin_num * 2; i++)
+    {
+        gr_uucgr.push_back(0);
+    }
+    for (int i = 0; i < N - 1; i++)
+    {
+        for (int j = i + 1; j < N; j++)
+        {
+            r = distance(i, j);
+            bin = int(r / dr);
+            if (bin < bin_num)
+            {
+                gr_uucgr[bin] += 2.0;
+                uuc = uuc_m(i, j);
+                gr_uucgr[bin + bin_num] += 2 * uuc;
+            }
+        }
+    }
+    for (int i = 0; i < bin_num * 2; i++)
+    {
+        gr_uucgr[bin] /= N;
+    }
+    return gr_uucgr;
+}
+
 #pragma endregion

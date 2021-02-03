@@ -63,11 +63,10 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
     # LineWidth, FontSize, LabelSize = 1, 9, 8
     plt.figure()
     plt.rc('text', usetex=True)
-    fig, axs = plt.subplots(10, 2, figsize=(
+    fig, axs = plt.subplots(11, 2, figsize=(
         246 / ppi*2, 246 / ppi * 5.5), sharex=True)  # , sharex=True
     #cpar_aj = cpar-np.outer([2.8, 2.0, 1.5, 0.8, 0], np.ones(len(cpar[0])))
     if(mode=="L"):
-        d0=1.2
         O_cpar_plot(axs[-1,0], F_ave, F_err, O_label, "F", r"$\left<F\right>$",
                 cpar, colors, alphas)
     O_cpar_plot(axs[0,0], E_ave, E_err, O_label, "E", r"$E$",

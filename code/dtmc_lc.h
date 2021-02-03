@@ -148,6 +148,8 @@ public:
     //\sum_x (nu(s) * nu(s+l))^2, how each slab nematic director
     // twist, correlation function
     std::vector<double> Qevec_m(std::vector<int> bead_list);
+    // pair distribution and twist pair distribution function measurement
+    std::vector<double> gr_uucgr_m(double dr, int bin_num);
 
     // useful tools
     double distance2(int ind_1, int ind_2);
@@ -189,7 +191,7 @@ public:
     // thermalisation of the system, starting from beta=0 (hot start)
     void O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                       double delta_s, double delta_theta, std::string folder,
-                      std::string finfo, int bin_num_r, int bin_num_un2, int bin_num_l);
+                      std::string finfo, std::vector<int> bin_nums, double del_r);
     // measure the obserables
     // energy versus lambda curve testing
 

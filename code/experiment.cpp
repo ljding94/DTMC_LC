@@ -184,7 +184,7 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
 void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                            double delta_s, double delta_theta,
                            std::string folder, std::string finfo,
-                           int bin_num_r, int bin_num_un2, int bin_num_l)
+                           std::vector<int> bin_nums, double del_r)
 {
     std::vector<double> E_all;
     std::vector<double> I2H2_all;
@@ -205,6 +205,8 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     std::vector<std::vector<double>> unu2r_all;
     std::vector<std::vector<double>> nu0nu2l_all;
     std::vector<std::vector<double>> nunu2lcov_all;
+    std::vector<std::vector<double>> gr_uucgr_all;
+
     double bead_accept = 0;
     double spin_accept = 0;
     double bond_accept = 0;
@@ -215,6 +217,10 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     {
         fix_bead = 1;
     }
+    int bn_r = bin_nums[0];
+    int bn_un2 = bin_nums[1];
+    int bn_l = bin_nums[2];
+    int bn_g = bin_nums[3];
 
     std::clock_t c_start = std::clock();
     for (int sweep_n = 0; sweep_n < MC_sweeps; sweep_n++)
@@ -248,23 +254,27 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
 
         if (sweep_n % sweep_p_G == 0)
         {
-            if (fix_bead && bin_num_l != 0)
+            if (fix_bead && bn_l != 0)
             {
-                nu0nu2l_all.push_back(nu0nu2l_m(bin_num_l));
-                nunu2lcov_all.push_back(nunu2lcov_m(bin_num_l));
+                nu0nu2l_all.push_back(nu0nu2l_m(bn_l));
+                nunu2lcov_all.push_back(nunu2lcov_m(bn_l));
             }
             else
             {
-                if (bin_num_r != 0)
+                if (bn_r != 0)
                 {
-                    un2r_all.push_back(un2r_m(bin_num_r));
+                    un2r_all.push_back(un2r_m(bn_r));
                 }
-                if (bin_num_un2 != 0)
+                if (bn_un2 != 0)
                 {
-                    un2dis_all.push_back(un2dis_m(bin_num_un2));
+                    un2dis_all.push_back(un2dis_m(bn_un2));
                 }
                 // don't waste time doing the measurement if it's not to be used
                 //unu2r_all.push_back(unu2r_m(bin_num_r));
+                if (bn_g != 0)
+                {
+                    gr_uucgr_all.push_back(gr_uucgr_m(del_r, bn_g));
+                }
             }
         }
     }
@@ -312,12 +322,12 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     }
     f.close();
 
-    if (fix_bead && bin_num_l != 0)
+    if (fix_bead && bn_l != 0)
     {
         std::ofstream f_nu0nu2l(folder + "/nu0nu2l_MC_" + finfo + ".txt");
         if (f_nu0nu2l.is_open())
         {
-            f_nu0nu2l << "bin_num=" << bin_num_l << "\n";
+            f_nu0nu2l << "bin_num=" << bn_l << "\n";
             f_nu0nu2l << "(n_u(0)*n_u(l))^2\n";
             for (int i = 0; i < nu0nu2l_all.size(); i++)
             {
@@ -334,7 +344,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
         std::ofstream f_nunu2lcov(folder + "/nunu2lcov_MC_" + finfo + ".txt");
         if (f_nunu2lcov.is_open())
         {
-            f_nunu2lcov << "bin_num=" << bin_num_l << "\n";
+            f_nunu2lcov << "bin_num=" << bn_l << "\n";
             f_nunu2lcov << "ave_s{(n_u(s)*n_u(s+l))^2}\n";
             for (int i = 0; i < nunu2lcov_all.size(); i++)
             {
@@ -350,13 +360,13 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     }
     else
     {
-        if (bin_num_r != 0)
+        if (bn_r != 0)
         {
             std::ofstream f_un2r(folder + "/un2r_MC_" + finfo + ".txt");
             // std::ofstream f_unu2r(folder + "/unu2r_MC_" + finfo + ".txt");
             if (f_un2r.is_open())
             {
-                f_un2r << "bin_num=" << bin_num_r << "\n";
+                f_un2r << "bin_num=" << bn_r << "\n";
                 f_un2r << "r, r_std,(u*n_u)^2(r)\n";
                 for (int i = 0; i < un2r_all.size(); i++)
                 {
@@ -370,12 +380,12 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
             }
             f_un2r.close();
         }
-        if (bin_num_un2 != 0)
+        if (bn_un2 != 0)
         {
             std::ofstream f_un2dis(folder + "/un2dis_MC_" + finfo + ".txt");
             if (f_un2dis.is_open())
             {
-                f_un2dis << "bin_num=" << bin_num_un2 << "\n";
+                f_un2dis << "bin_num=" << bn_un2 << "\n";
                 f_un2dis << "un2 density/ un2*bin_num_un2\n";
                 for (int i = 0; i < un2dis_all.size(); i++)
                 {
@@ -389,6 +399,26 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                 f_un2dis.close();
             }
         }
+        if (bn_g != 0)
+        {
+            std::ofstream f_gr_uucgr(folder + "/gr_uucgr_MC_" + finfo + ".txt");
+            if (f_gr_uucgr.is_open())
+            {
+                f_gr_uucgr << "bin_num=" << bn_g << "\n";
+                f_gr_uucgr << "gr,uuc_gr\n";
+                for (int i = 0; i < gr_uucgr_all.size(); i++)
+                {
+                    f_gr_uucgr << gr_uucgr_all[i][0];
+                    for (int j = 1; j < gr_uucgr_all[i].size(); j++)
+                    {
+                        f_gr_uucgr << "," << gr_uucgr_all[i][j];
+                    }
+                    f_gr_uucgr << "\n";
+                }
+                f_gr_uucgr.close();
+            }
+        }
+
         /*
         if (f_unu2r.is_open()) {
             f_unu2r << "bin_num=" << bin_num_r << "\n";

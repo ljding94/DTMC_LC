@@ -4,6 +4,7 @@ from plot import *
 from autocorrelation import *
 from scipy.optimize import curve_fit
 from scipy import odr
+import scipy.fft
 
 def find_cpar_ind(par_nm,mode):
     cpar_ind = -1
@@ -37,6 +38,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         par_dealing[cpar_ind] = par[cpar_ind][i]
         f2rtail = "MC"
         for j in range(len(par_dealing)):
+            print("par_dealing[j]",j,par_dealing[j])
             f2rtail+="_"+par_nm[j]+"%.*f"%(par_dg[j],par_dealing[j])
         f2rtail+=".txt"
         file2read = foldername + "/O_"+f2rtail
@@ -49,7 +51,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         # N in file name is not real N
         N =par[find_cpar_ind(par_nm,"N")]
         Ndict={200:187,400:367,500:439,800:721,1000:823,1600:1459}
-        if(par[find_cpar_ind(par_nm,"L")]==-1):
+        if(mode!="L" and par[find_cpar_ind(par_nm,"L")]==-1):
             N=Ndict[N]
         un2=Tun2/N
         # Ne2 case, need Ledif for additional info
@@ -72,7 +74,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu",Et)
         Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")]*Tuuc
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc",Et)
-        Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")][i]*(Tun2-N)
+        Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")]*(Tun2-N)
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc+0.5Cn*(Tun2-N)",Et)
 
 
@@ -393,7 +395,7 @@ def cos_fit(l,p):
     cos = np.cos(4*np.pi*l/p)
     return cos
 
-def twistl_stat_plot(foldername, par, par_nm, par_dg, mode, d0=1.5, head="nunu2l",tag="",leg_num=5,bin_num=40):
+def twistl_stat_plot(foldername, par, par_nm, par_dg, mode, d0=1.5, head="nunu2l",tag="",leg_num=5):
     Ne = par[find_cpar_ind(par_nm,"Ne")]
     cpar_ind = find_cpar_ind(par_nm,mode)
     cpar = par[cpar_ind]
@@ -414,6 +416,7 @@ def twistl_stat_plot(foldername, par, par_nm, par_dg, mode, d0=1.5, head="nunu2l
         f2rtail+=".txt"
         file2read = foldername + "/"+head+"_"+f2rtail
         data = np.loadtxt(file2read, skiprows=2, delimiter=",", unpack=True)
+        bin_num=len(data)
         nunu2l_all.append(np.average(data,axis=1))
         nunu2lerr_all.append(np.std(data,axis=1)/np.sqrt(len(data[0])))
 
