@@ -886,18 +886,20 @@ std::vector<double> dtmc_lc::un2dis_m(int bin_num)
     return un2dis;
 }
 
-std::vector<double> dtmc_lc::gr_uucgr_m(double dr, int bin_num)
+std::vector<double> dtmc_lc::uucr_m(double dr, int bin_num)
 {
-    std::vector<double> gr_uucgr;
-    std::vector<double> gr;
-    std::vector<double> uucgr;
-    // TODO: implement pair distribution function and related structure function measurement
+    std::vector<double> uucr;
+    std::vector<int> count;
+    //std::vector<double> gr;
+    //std::vector<double> uucgr;
     int bin;
     double r, uuc;
-    for (int i = 0; i < bin_num * 2; i++)
+    for (int i = 0; i < bin_num; i++)
     {
-        gr_uucgr.push_back(0);
+        uucr.push_back(0);
+        count.push_back(0);
     }
+    // find uucr, measure over all pairs of beads <i,j>.
     for (int i = 0; i < N - 1; i++)
     {
         for (int j = i + 1; j < N; j++)
@@ -906,17 +908,19 @@ std::vector<double> dtmc_lc::gr_uucgr_m(double dr, int bin_num)
             bin = int(r / dr);
             if (bin < bin_num)
             {
-                gr_uucgr[bin] += 2.0;
                 uuc = uuc_m(i, j);
-                gr_uucgr[bin + bin_num] += 2 * uuc;
+                uucr[bin] += uuc;
+                count[bin]+=1;
             }
         }
     }
-    for (int i = 0; i < bin_num * 2; i++)
+    for (int b = 0; b < bin_num; b++)
     {
-        gr_uucgr[bin] /= N;
+        if(count[b]){
+            uucr[b]/=count[b];
+        }
     }
-    return gr_uucgr;
+    return uucr;
 }
 
 #pragma endregion

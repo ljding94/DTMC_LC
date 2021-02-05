@@ -22,7 +22,7 @@ def main():
     #return 0
 
 
-    foldername = "../data/Ne1/Jan31_2021"
+    foldername = "../data/Ne1/Feb3_2021"
     print("analyzing "+foldername)
     pars = []
     colors = []
@@ -36,27 +36,27 @@ def main():
     Ls=np.arange(20,70.1,2)
     L=-1
     kars = np.arange(20,100.1,20)
-    kar = 20
+    kar = 100
     kargs = np.arange(0.0,10.1,1.0)
     karg=0.0
     lams = np.arange(0.0,18.1,0.2)
     lam=5.0
     Kds = np.arange(0.0,4.6,0.5)
-    Kd=4.0
+    Kd=10.0
     qs=np.arange(0.0,4.6,0.5)
-    qs = [0.2,0.4,0.8,1.6]
+    #qs = [0.2,0.4,0.8,1.6]
     q=0.5
     Cns = np.arange(3.0,15.1,1.0)
-    Cn=4.0
+    Cn=10.0
     kards=np.arange(1.0,5.1,1.0)
     kard=0.0
     Ne1pars = []
     Ne2pars = []
-    for q in qs:
-        pars.append([N, Ne, Ls, kar, karg, lam, Kd, q, Cn, kard])
+    for Kd in Kds:
+        pars.append([N, Ne, L, kar, karg, lam, Kd, qs, Cn, kard])
     par_nm = ["N", "Ne", "L", "kar","karg","lam","Kd","q", "Cn", "kard"]
     par_dg = [0,0,0,0,1,1,1,1,1,1] # nsumber of digit for each
-    mod="L"
+    mod="q"
     for i in range(len(pars)):
         print("analyzing",pars[i])
         N, Ne, L, kar, karg, lam, Kd, q,Cn,kard = pars[i]
@@ -68,8 +68,9 @@ def main():
             #pass
             #twistr_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2r",tag=r"$Kd=%.1f$"%Kd,leg_num=1)
             #un2dis_stat_plot(foldername,pars[i],par_nm,par_dg,mode=mod,head="un2dis",tag=r"$K_d=%.0f,C_n=%.0f$"%(Kd,Cn),leg_num=5)
+            gr_uucgr_stat_ana(foldername, pars[i], par_nm, par_dg, mode=mod, head="gr_uucgr", dr=0.2,tag="",leg_num=5)
 
-        for L in Ls[::2]:
+        for q in qs[::1]:
             if(i%1==0):
                 filename = foldername + "/State_N%.0f_Ne%.0f_L%.0f_kar%.0f_karg%.1f_lam%.1f_Kd%.1f_q%.1f_Cn%.1f_kard%.1f.txt" % (N, Ne, L, kar,karg,lam,Kd,q,Cn, kard)
                 config_plot_xyz(filename, mesh=0,rod=1,tag=r"$K_d=%.1f,q=%.1f,C_n=%.1f$" % (Kd,q,Cn),Format="png")

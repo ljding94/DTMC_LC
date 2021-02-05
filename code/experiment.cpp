@@ -205,7 +205,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
     std::vector<std::vector<double>> unu2r_all;
     std::vector<std::vector<double>> nu0nu2l_all;
     std::vector<std::vector<double>> nunu2lcov_all;
-    std::vector<std::vector<double>> gr_uucgr_all;
+    std::vector<std::vector<double>> uucr_all;
 
     double bead_accept = 0;
     double spin_accept = 0;
@@ -273,7 +273,7 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
                 //unu2r_all.push_back(unu2r_m(bin_num_r));
                 if (bn_g != 0)
                 {
-                    gr_uucgr_all.push_back(gr_uucgr_m(del_r, bn_g));
+                    uucr_all.push_back(uucr_m(del_r, bn_g));
                 }
             }
         }
@@ -401,21 +401,21 @@ void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
         }
         if (bn_g != 0)
         {
-            std::ofstream f_gr_uucgr(folder + "/gr_uucgr_MC_" + finfo + ".txt");
-            if (f_gr_uucgr.is_open())
+            std::ofstream f_uucr(folder + "/uucr_MC_" + finfo + ".txt");
+            if (f_uucr.is_open())
             {
-                f_gr_uucgr << "bin_num=" << bn_g << "\n";
-                f_gr_uucgr << "gr,uuc_gr\n";
-                for (int i = 0; i < gr_uucgr_all.size(); i++)
+                f_uucr << "bin_num=" << bn_g <<",dr="<<del_r<< "\n";
+                f_uucr << "uucr (normalized)\n";
+                for (int i = 0; i < uucr_all.size(); i++)
                 {
-                    f_gr_uucgr << gr_uucgr_all[i][0];
-                    for (int j = 1; j < gr_uucgr_all[i].size(); j++)
+                    f_uucr << uucr_all[i][0];
+                    for (int j = 1; j < uucr_all[i].size(); j++)
                     {
-                        f_gr_uucgr << "," << gr_uucgr_all[i][j];
+                        f_uucr << "," << uucr_all[i][j];
                     }
-                    f_gr_uucgr << "\n";
+                    f_uucr << "\n";
                 }
-                f_gr_uucgr.close();
+                f_uucr.close();
             }
         }
 

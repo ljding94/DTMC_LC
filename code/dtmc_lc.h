@@ -149,7 +149,7 @@ public:
     // twist, correlation function
     std::vector<double> Qevec_m(std::vector<int> bead_list);
     // pair distribution and twist pair distribution function measurement
-    std::vector<double> gr_uucgr_m(double dr, int bin_num);
+    std::vector<double> uucr_m(double dr, int bin_num);
 
     // useful tools
     double distance2(int ind_1, int ind_2);
