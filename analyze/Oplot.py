@@ -666,3 +666,32 @@ def Chi2_gradient(x,y,yerr,k):
 
     return b,berr
 
+def plot_O_MCsteps(filename):
+    data = np.loadtxt(filename, skiprows=13, delimiter=",", unpack=True)
+    Ne=1
+    E,Le,IdA,I2H,I2H2,IK,Tp2uu,Tuuc,Bond_num,Tun2,IKun2 = data
+    p2uu = Tp2uu/Bond_num
+    uuc = Tuuc/Bond_num
+    # N in file name is not real N
+    print("OMCsteps")
+    ppi = 72
+    # LineWidth, FontSize, LabelSize = 1, 9, 8
+    plt.figure()
+    plt.rc('text', usetex=True)
+    fig, axs = plt.subplots(5, 1, figsize=(
+        246 / ppi, 246 / ppi * 0.6*5),sharex=True)
+    #cpar_aj = cpar-np.outer([2.8, 2.0, 1.5, 0.8, 0], np.ones(len(cpar[0])))
+    MCstep=np.array(range(len(E)))+1
+    axs[0].plot(MCstep,E,"-")
+    axs[0].set_ylabel(r"$E$")
+    axs[1].plot(MCstep,I2H2,"-")
+    axs[1].set_ylabel(r"$\int (2H)^2 dA$")
+    axs[2].plot(MCstep,Le,"-")
+    axs[2].set_ylabel(r"$\oint ds$")
+    axs[3].plot(MCstep,IK,"-")
+    axs[3].set_ylabel(r"$\int K dA$")
+    axs[4].plot(MCstep,Tp2uu,"-")
+    axs[4].set_ylabel(r"$\sum_{(i,j)}P_2(u\cdot n)$")
+    axs[4].set_xlabel(r"MC steps")
+    plt.tight_layout(pad=0.5)
+    plt.savefig(filename[:-4]+".pdf")

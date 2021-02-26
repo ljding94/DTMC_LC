@@ -5,6 +5,7 @@
 #include <iostream>
 #include <numeric>
 #include <string>
+#include <vector>
 
 void dtmc_lc::State_write(std::string filename)
 {
@@ -181,11 +182,10 @@ void dtmc_lc::Thermal(int MC_sweeps, int step_p_sweep, int beta_steps,
         }
     }
 }
+
 void dtmc_lc::O_MC_measure(int MC_sweeps, int sweep_p_G, int step_p_sweep,
-                           double delta_s, double delta_theta,
-                           std::string folder, std::string finfo,
-                           std::vector<int> bin_nums, double del_r)
-{
+                      double delta_s, double delta_theta, std::string folder,
+                      std::string finfo, std::vector<int> bin_nums, double del_r){
     std::vector<double> E_all;
     std::vector<double> I2H2_all;
     std::vector<std::vector<double>> Les_all;

@@ -38,7 +38,7 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         par_dealing[cpar_ind] = par[cpar_ind][i]
         f2rtail = "MC"
         for j in range(len(par_dealing)):
-            print("par_dealing[j]",j,par_dealing[j])
+            #print("par_dealing[j]",j,par_dealing[j])
             f2rtail+="_"+par_nm[j]+"%.*f"%(par_dg[j],par_dealing[j])
         f2rtail+=".txt"
         file2read = foldername + "/O_"+f2rtail
@@ -64,6 +64,8 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
             Ledif_err.append(np.sqrt(2 * tau / len(Ledif) * cov0))
 
 
+        '''
+        was used for checking energy
         print("energy slicing E",E)
         print("Les[0]",Les[0])
         Et = E-0.5*par[find_cpar_ind(par_nm,"kar")]*I2H2
@@ -72,11 +74,11 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
         print("E-0.5kar*I2H2-lam*L",Et)
         Et=Et+par[find_cpar_ind(par_nm,"Kd")]*Tp2uu
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu",Et)
-        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")][i]*Tuuc
+        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")]*Tuuc
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc",Et)
         Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")]*(Tun2-N)
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc+0.5Cn*(Tun2-N)",Et)
-
+        '''
 
         # E
         E_ave.append(np.average(E))
@@ -255,7 +257,7 @@ def odr_lamp_popt(xdata,ydata,xerr,yerr):
     #output.pprint()
     return (output.beta,output.sd_beta)
 
-def twistr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",leg_num=5):
+def tiltr_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2r",tag="",leg_num=5):
     Ne = par[find_cpar_ind(par_nm,"Ne")]
     cpar_ind = find_cpar_ind(par_nm,mode)
     cpar = par[cpar_ind]
@@ -562,11 +564,12 @@ def un2dis_stat_plot(foldername, par, par_nm, par_dg, mode,head="un2dis",tag="",
     plt.tight_layout(pad=0.5)
     plt.savefig(savefile[:-4]+".pdf",format="pdf")
 
-def gr_uucgr_stat_ana(foldername, par, par_nm, par_dg, mode, head="gr_uucgr", dr=0.2,tag="",leg_num=5):
+
+def uucr_stat_ana(foldername, par, par_nm, par_dg, mode, head="uucr", dr=0.2,tag="",leg_num=5):
     Ne = par[find_cpar_ind(par_nm,"Ne")]
     cpar_ind = find_cpar_ind(par_nm,mode)
     cpar = par[cpar_ind]
-    gr_all,uucgr_all = [],[]
+    uucr_all = []
     for i in range(len(cpar)):
         par_dealing = par[:]
         par_dealing[cpar_ind] = par[cpar_ind][i]
@@ -576,9 +579,8 @@ def gr_uucgr_stat_ana(foldername, par, par_nm, par_dg, mode, head="gr_uucgr", dr
         f2rtail+=".txt"
         file2read = foldername + "/"+head+"_"+f2rtail
         data = np.loadtxt(file2read, skiprows=2, delimiter=",", unpack=True)
-        bn_g= int(len(data)/2)
-        gr_all.append(np.average(data[:bn_g],axis=1))
-        uucgr_all.append(np.average(data[bn_g:],axis=1))
+        bn_g= len(data)
+        uucr_all.append(np.average(data,axis=1))
 
     f2stail = "MC"
     for j in range(len(par)):
@@ -597,8 +599,8 @@ def gr_uucgr_stat_ana(foldername, par, par_nm, par_dg, mode, head="gr_uucgr", dr
     # LineWidth, FontSize, LabelSize = 1, 9, 8
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble=r"\usepackage{physics}")
-    fig, axs = plt.subplots(2, 1, figsize=(
-        246 / ppi*1, 246 / ppi * 2*0.8))
+    fig, axs = plt.subplots(1, 1, figsize=(
+        246 / ppi*1, 246 / ppi * 0.8))
 
     rs = dr*np.linspace(0.5,(bn_g-0.5),bn_g)
     gr_shift = np.linspace(0,2,len(cpar))
@@ -609,12 +611,12 @@ def gr_uucgr_stat_ana(foldername, par, par_nm, par_dg, mode, head="gr_uucgr", dr
         if(i in leg_ind):
             Linestyle="-"
             Label=mode+"=%.*f"%(par_dg[cpar_ind],cpar[i])
-        axs[0].plot(rs,gr_all[i]/(2*np.pi*rs*dr)/439+gr_shift[i],linestyle=Linestyle,label=Label)
-        axs[1].plot(rs,uucgr_all[i]/(2*np.pi*rs*dr)/439+gr_shift[i],linestyle=Linestyle,label=Label)
-    axs[0].set_ylabel(r"$g(r)$")
-    axs[1].set_ylabel(r"$T(r) g(r)$")
-    axs[1].set_xlabel(r"$r$")
-    axs[0].legend()
+        axs.plot(rs,uucr_all[i]+gr_shift[i],linestyle=Linestyle,label=Label)
+    axs.set_ylabel(r"$uuc(r)$")
+    axs.set_xlabel(r"$r$")
+    axs.legend()
     plt.tight_layout(pad=0.5)
     plt.savefig(savefile[:-4]+".pdf",format="pdf")
+
+
 
