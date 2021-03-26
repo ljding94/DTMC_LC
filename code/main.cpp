@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
     int bn_r = 0;       // penetration depth bin_num
     int bn_un2 = 0;     //un2 distribution measurement bin_num
     int bn_l = 0;       // extension experiment bin_num
-    int bn_g = 50;      // pair distribution related bin_num
+    int bn_g = 0;      // pair distribution related bin_num
     double del_r = 0.2; // pair distribution r increment
     std::vector<int> bin_nums{bn_r, bn_un2, bn_l, bn_g};
     bool fix_bead_on = 0;
@@ -124,9 +124,9 @@ int main(int argc, char const *argv[])
         }
         // membrane.Thermal(500, N / (delta_s * delta_s), 10,
         // delta_s,delta_theta);
-        membrane.Thermal(1000, N / (delta_s * delta_s), 1, delta_s,
+        membrane.Thermal(2000, N / (delta_s * delta_s), 1, delta_s,
                          delta_theta);
-        membrane.O_MC_measure(2000, 50, N / (delta_s * delta_s) + 1, delta_s,
+        membrane.O_MC_measure(4000, 50, N / (delta_s * delta_s) + 1, delta_s,
                               delta_theta, folder, finfo, bin_nums, del_r);
         membrane.State_write(folder + "/State_" + finfo + ".txt");
 

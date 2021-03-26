@@ -22,7 +22,8 @@ def E_lams_cal(folder,lams,Cn,m,q0,bn_r,bn_phi,method):
         Emins.append(opt.fun)
         r1mins.append(opt.x[0])
         qthetamins.append(opt.x[1])
-    savename = folder+"/Emin_lams_Cn%.0f_m%d_q%.1f.txt"%(Cn,m,q0)
+
+    savename = folder+"/Emin_lams_Cn%.0f_m%d_q%.2f.txt"%(Cn,m,q0)
     with open (savename,"w") as f:
         f.write("lam,Emin,r1min,qthetamin\n")
         for i in range(len(Emins)):

@@ -76,7 +76,7 @@ def Os_pars_plot(foldername, pars,par_nm,par_dg, mode):
         Le_ave_diff = np.abs(Les_ave[1]-Les_ave[0])
         Le_err_diff = np.sqrt(np.power(Les_err[1],2)+np.power(Les_err[0],2))
         O_cpar_plot(axs[1,1], Le_ave_diff, Le_err_diff, O_label, "Le_diff", r"$|\left<\int_0 ds\right>-\left<\int_1 ds\right>|$",cpar, colors, alphas)
-        Ledif_ave,Ledif_tau,Ledif_err = data[28+3*(Ne-1):]
+        Ledif_ave,Ledif_tau,Ledif_err = data[31+3*(Ne-1):]
         O_cpar_plot(axs[2,1], Ledif_ave, Ledif_ave, O_label, "Le_diff'", r"$\left<|\int_0 ds-\int_1 ds|\right>$",cpar, colors, alphas)
         O_cpar_plot(axs[3,1], Le_ave_diff/Le_ave, Le_err_diff*0, O_label, "Le_diff/Le_ave", r"$|\left<\int_0 ds\right>-\left<\int_1 ds\right>|/sum$",cpar, colors, alphas)
         O_cpar_plot(axs[4,1], Ledif_ave/Le_ave, Ledif_ave*0, O_label, "Le_diff/Le_ave'", r"$\left<|\int_0 ds-\int_1 ds|\right>/sum$",cpar, colors, alphas)

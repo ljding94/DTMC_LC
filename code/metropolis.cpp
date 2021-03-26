@@ -257,9 +257,13 @@ int dtmc_lc::bond_metropolis()
         return 0;
     }
 
-    // check the a-b distance
+    // check the a-b distance, a-b is the new bond
     if (distance(ind_a, ind_b) > l0)
     {
+        return 0;
+    }
+    // check edge_num, can't connect different edges
+    if((mesh[ind_a].edge_num!=-1) && (mesh[ind_b].edge_num!=-1) && (mesh[ind_a].edge_num==mesh[ind_b].edge_num)){
         return 0;
     }
     // check # of nei
@@ -689,6 +693,16 @@ int dtmc_lc::edge_metropolis()
         {
             // std::cout << "couldn't find ind_i!!?\n";
             return 0;
+        }
+
+        // for Ne>1 check if i has neighbour on the other edge
+        if(Ne>1){
+            for (int k = 0; k < mesh[ind_i].nei.size(); k++)
+            {
+                if(mesh[mesh[ind_i].nei[k]].edge_num!=-1 &&mesh[mesh[ind_i].nei[k]].edge_num!=mesh[ind_j].edge_num){
+                    return 0;
+                }
+            }
         }
         i_nei = mesh[ind_i].nei;
 

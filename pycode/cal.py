@@ -148,9 +148,9 @@ def opt_r1_qtheta_fun(fun,lam,Cn,m,q0,bn_r,bn_phi,method):
     r1is_m = {1:np.sqrt(3),2:np.sqrt(2),3:np.power(2*np.sqrt(7)-1,1/6),4:1.20393,5:1.16169}
     r1bound=r1is_m[m]-0.1
     if method:
-        opt = optimize.minimize(fun,r1qtheta0,args=paras,bounds=((0.8,r1bound),(0,np.pi)),method=method)
+        opt = optimize.minimize(fun,r1qtheta0,args=paras,bounds=((0.2,r1bound),(0,np.pi)),method=method)
     else:
-        opt = optimize.minimize(fun,r1qtheta0,args=paras,bounds=((0.8,r1bound),(0,np.pi)))
+        opt = optimize.minimize(fun,r1qtheta0,args=paras,bounds=((0.2,r1bound),(0,np.pi)))
     return opt
 
 def error_test():
