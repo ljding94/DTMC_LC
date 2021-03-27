@@ -124,6 +124,7 @@ int main(int argc, char const *argv[])
         }
         // membrane.Thermal(500, N / (delta_s * delta_s), 10,
         // delta_s,delta_theta);
+        // used 2000, 4000 for manuscript
         membrane.Thermal(2000, N / (delta_s * delta_s), 1, delta_s,
                          delta_theta);
         membrane.O_MC_measure(4000, 50, N / (delta_s * delta_s) + 1, delta_s,
