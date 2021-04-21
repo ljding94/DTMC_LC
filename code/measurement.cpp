@@ -879,7 +879,7 @@ std::vector<double> dtmc_lc::un2dis_m(int bin_num)
     for (int i = 0; i < mesh.size(); i++)
     {
         //bin = int(mesh[i].un2 / del_un2);
-        bin = int(std::acos(mesh[i].un2) / del_theta);
+        bin = int(std::acos(std::sqrt(mesh[i].un2)) / del_theta);
         if (bin >= bin_num)
         {
             std::cout << "out of range for un2dis bin_num\n";
