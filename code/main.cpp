@@ -45,10 +45,10 @@ int main(int argc, char const *argv[])
 
     Kt = q * Kd;
     // will skip bin measurement if set to 0;
-    int bn_r = 0;       // penetration depth bin_num
-    int bn_un2 = 0;     //un2 distribution measurement bin_num
+    int bn_r = 0;       //40 penetration depth bin_num
+    int bn_un2 = 50;    //50 un2 distribution measurement bin_num
     int bn_l = 0;       // extension experiment bin_num
-    int bn_g = 0;      // pair distribution related bin_num
+    int bn_g = 0;       // pair distribution related bin_num
     double del_r = 0.2; // pair distribution r increment
     std::vector<int> bin_nums{bn_r, bn_un2, bn_l, bn_g};
     bool fix_bead_on = 0;

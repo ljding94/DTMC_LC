@@ -865,7 +865,9 @@ std::vector<double> dtmc_lc::nunu2lcov_m(int bin_num)
 
 std::vector<double> dtmc_lc::un2dis_m(int bin_num)
 {
+    // modified this for tilt angle distribution
     std::vector<double> un2dis;
+    double del_theta = 0.5 * PI / bin_num;
     double del_un2 = 1.0 / bin_num;
     double un2_increment = 1.0 / mesh.size();
     int bin;
@@ -876,7 +878,8 @@ std::vector<double> dtmc_lc::un2dis_m(int bin_num)
 
     for (int i = 0; i < mesh.size(); i++)
     {
-        bin = int(mesh[i].un2 / del_un2);
+        //bin = int(mesh[i].un2 / del_un2);
+        bin = int(std::acos(mesh[i].un2) / del_theta);
         if (bin >= bin_num)
         {
             std::cout << "out of range for un2dis bin_num\n";
@@ -910,14 +913,15 @@ std::vector<double> dtmc_lc::uucr_m(double dr, int bin_num)
             {
                 uuc = uuc_m(i, j);
                 uucr[bin] += uuc;
-                count[bin]+=1;
+                count[bin] += 1;
             }
         }
     }
     for (int b = 0; b < bin_num; b++)
     {
-        if(count[b]){
-            uucr[b]/=count[b];
+        if (count[b])
+        {
+            uucr[b] /= count[b];
         }
     }
     return uucr;

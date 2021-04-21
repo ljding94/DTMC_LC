@@ -6,17 +6,16 @@ from matplotlib.colors import Normalize
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter,AutoMinorLocator)
 from cal import *
 from os import path
-def xyznENP_plot(m,r1,q0,qtheta):
+def xyznENP_plot(folder,m,r1,q0,qtheta):
     # plot Enneper's surface and face normal
     fig = plt.figure()
     ax=fig.gca(projection="3d")
     r,phi=np.meshgrid(np.linspace(0,r1,100),np.linspace(0,2*np.pi,100))
     R = R_nmlz(m,r1)
     X,Y,Z=xyzENP(m,R,r,phi)
-    X,Y,Z=X.flatten(),Y.flatten(),Z.flatten()
-    ax.plot_trisurf(X,Y,Z,linewidth=0,shade=0,color="gray",alpha=0.5)
-    #ax.plot_surface(X,Y,Z,linewidth=0,shade=0,color="gray",alpha=0.5)
-
+    #X,Y,Z=X.flatten(),Y.flatten(),Z.flatten()
+    #ax.plot_trisurf(X,Y,Z,linewidth=0,shade=0,color="gray",alpha=0.5)
+    ax.plot_surface(X,Y,Z,linewidth=0.5,shade=0,color="gray",edgecolor="black",alpha=0.5,rstride=20, cstride=20)
     # plot face normal
     r,phi=np.meshgrid(np.linspace(0,r1,10),np.linspace(0,2*np.pi,40))
     r,phi=r.flatten(),phi.flatten()
@@ -50,7 +49,7 @@ def xyznENP_plot(m,r1,q0,qtheta):
     ax.axes.set_ylim3d(bottom=xmin, top=xmax)
     ax.axes.set_zlim3d(bottom=xmin, top=xmax)
     plt.title("m=%d,r1=%.1f,q0=%.1f,qtheta=%.1f"%(m,r1,q0,qtheta))
-    plt.savefig("config_m%d_r1%.1f_q0%.1f_qtheta%.1f.pdf"%(m,r1,q0,qtheta))
+    plt.savefig(folder+"/config_m%d_r1%.1f_q0%.1f_qtheta%.1f.pdf"%(m,r1,q0,qtheta))
 
 
 
@@ -233,6 +232,7 @@ def get_minms(foldername,Cn,ms,qs,dq,lams,ncut=-1):
     qp,lamp = np.meshgrid(qs,lams[:ncut],indexing="ij")
     mp = [0]
     Emin = []
+    r1op,qthetaop=[],[] # optimized r1 and qtheta coresponding to Emin with m=1
     for i in range(len(qs)):
         # iterating over all m
         Emin.append([E_Disk(lams[:ncut],Cn,qs[i])])
@@ -280,6 +280,59 @@ def phase_of_Emin_pcolormesh(foldername,Cn,ms,qs,qd,lams):
     plt.tight_layout(pad=0.5)
     plt.savefig(foldername+"/phase_Emin.pdf")
     plt.close()
+
+def Emin_r1op_qthetaop_m1_pcolormesh(foldername,Cn,qs,qd,lams):
+    print("plotting colormap for m=1 case")
+    ncut=-1
+    qp,lamp = np.meshgrid(qs,lams[:ncut],indexing="ij")
+    lams_all,Emin_all,r1min_all,qthetamin_all = [],[],[],[]
+    E_disks = []
+    for i in range(len(qs)):
+        #just m=1 case
+        # iterating over all q
+        filename=foldername+"/Emin_lams_Cn%.0f_m1_q%.2f.txt"%(Cn,qs[i])
+        data = np.loadtxt(filename,delimiter=",",skiprows=1,unpack=True)
+        lams_all.append(data[0][:ncut])
+        Emin_all.append(data[1][:ncut])
+        r1min_all.append(data[2][:ncut])
+        qthetamin_all.append(data[3][:ncut])
+        # energy of disk
+        E_disks.append(E_Disk(lams_all[-1],Cn,qs[i]))
+    DelEmin = np.array(E_disks)-np.array(Emin_all)
+    print("np.shape(DelEmin)",np.shape(DelEmin))
+    print("np.shape(np.transpose(DelEmin))",np.shape(np.transpose(DelEmin)))
+
+    ppi = 72
+    fig = plt.figure(figsize=(246 / ppi * 2, 246 / ppi * 2*0.8))
+    plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble=r'\usepackage{physics}')
+    ax_E = plt.subplot2grid((2,2), (0, 0))
+    ax_Edisk = plt.subplot2grid((2,2), (0, 1))
+    ax_DelE = plt.subplot2grid((2,2), (1, 0))
+    ax_r1 = plt.subplot2grid((2,2), (1, 1))
+    #ax_qtheta = plt.subplot2grid((2,2), (3, 0))
+    im0=ax_E.pcolormesh(np.transpose(lamp),np.transpose(qp),np.transpose(Emin_all),shading="auto",cmap=cm.get_cmap("rainbow"))
+    cbar0=fig.colorbar(im0, ax=ax_E)
+    cbar0.set_label(r"$E_{m1}$")
+    imd=ax_Edisk.pcolormesh(np.transpose(lamp),np.transpose(qp),np.transpose(E_disks),shading="auto",cmap=cm.get_cmap("rainbow"))
+    cbard=fig.colorbar(imd, ax=ax_Edisk)
+    cbard.set_label(r"$E_{disk}$")
+    im1=ax_DelE.pcolormesh(np.transpose(lamp),np.transpose(qp),np.transpose(DelEmin),shading="auto",cmap=cm.get_cmap("rainbow"))
+    cbar1=fig.colorbar(im1, ax=ax_DelE)
+    cbar1.set_label(r"$E_{disk}-E_{m1}$")
+    im2=ax_r1.pcolormesh(np.transpose(lamp),np.transpose(qp),np.transpose(r1min_all),shading="auto",cmap=cm.get_cmap("rainbow"))
+    cbar2=fig.colorbar(im2, ax=ax_r1)
+    cbar2.set_label(r"$r_1 (optimized)$")
+    #im3=ax_qtheta.pcolormesh(np.transpose(lamp),np.transpose(qp),np.transpose(qthetamin_all),shading="auto",cmap=cm.get_cmap("rainbow"))
+    #cbar3=fig.colorbar(im3, ax=ax_qtheta)
+    #cbar3.set_label(r"$\theta_q (optimized)$")
+    ax_E.set_ylabel(r"$q$")
+    ax_E.set_xlabel(r"$\lambda$")
+    plt.tight_layout(pad=0.5)
+    plt.savefig(foldername+"/Emin_r1op_qthetaop_mesh.pdf")
+    plt.close()
+
+
 
 def phase_E_fill_between_plot(foldername,Cn,ms,qs,lams,LineWidth, FontSize, LabelSize):
     print("plotting q lam phase diagram using fill between method")

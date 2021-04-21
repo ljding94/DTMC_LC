@@ -263,8 +263,9 @@ int dtmc_lc::bond_metropolis()
         return 0;
     }
     // check edge_num, can't connect different edges
-    if((mesh[ind_a].edge_num!=-1) && (mesh[ind_b].edge_num!=-1) && (mesh[ind_a].edge_num!=mesh[ind_b].edge_num)){
-        return 0;
+    if(Ne>1){
+        if((mesh[ind_a].edge_num!=-1) && (mesh[ind_b].edge_num!=-1) && (mesh[ind_a].edge_num!=mesh[ind_b].edge_num)){
+        return 0;}
     }
     // check # of nei
     // can't be greater than 9, otherwise will have more than 9 after flip

@@ -29,6 +29,16 @@ def tau_int_cal_rho(rho, c=6.):
     ms = np.arange(0, len(rho))
     idx = np.argmax(ms >= taus)
     tau = taus[idx] / c
+    #just checking this function
+    '''
+    plt.figure()
+    plt.plot(range(len(taus)),taus)
+    plt.plot([0,len(taus)],[tau,tau])
+    plt.show()
+    plt.close()
+    print(tau)
+    '''
+    #
     m = ms[idx]
     # m=0
     # while m<c*taus[m]:

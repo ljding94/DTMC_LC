@@ -64,17 +64,20 @@ def O_stat_ana(foldername,par,par_nm,par_dg, mode, tau_c=6):
             Ledif_err.append(np.sqrt(2 * tau / len(Ledif) * cov0))
 
 
+
+        #was used for checking energy
+        # again, it's correct
         '''
-        was used for checking energy
         print("energy slicing E",E)
-        print("Les[0]",Les[0])
+        print("cpar",cpar[i])
+        print("Les[0]+Les[1]",Les[0]+Les[1])
         Et = E-0.5*par[find_cpar_ind(par_nm,"kar")]*I2H2
         print("E-0.5kar*I2H2",Et)
-        Et = Et-par[find_cpar_ind(par_nm,"lam")]*Les[0]
+        Et = Et-par[find_cpar_ind(par_nm,"lam")]*(Les[0]+Les[1])
         print("E-0.5kar*I2H2-lam*L",Et)
         Et=Et+par[find_cpar_ind(par_nm,"Kd")]*Tp2uu
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu",Et)
-        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")]*Tuuc
+        Et=Et+par[find_cpar_ind(par_nm,"Kd")]*par[find_cpar_ind(par_nm,"q")][i]*Tuuc
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc",Et)
         Et=Et+0.5*par[find_cpar_ind(par_nm,"Cn")]*(Tun2-N)
         print("E-0.5kar*I2H2-lam*L+Kd*Tp2uu+Kd*q*Tuuc+0.5Cn*(Tun2-N)",Et)
