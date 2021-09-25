@@ -131,6 +131,7 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
     if(rod):
         for i in range(len(x)):
             ax_xy.plot([x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],[y[i]-0.5*d*sy[i],y[i]+0.5*d*sy[i]],"-",linewidth=1.5,color=cmap(norm(deg[i])))
+
             ax_zx.plot([z[i]-0.5*d*sz[i],z[i]+0.5*d*sz[i]],[x[i]-0.5*d*sx[i],x[i]+0.5*d*sx[i]],"-",linewidth=1.5,color=cmap(norm(deg[i])))
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
         sm.set_array([])
@@ -149,6 +150,19 @@ def config_plot_xyz(filename,mesh=0,rod=1,cvt_map="",cmap_smooth=0,tag="", Forma
     #ax_xy.legend(title=tag)
     # plt.savefig(filename[:-4] + "_xy.pdf", dpi=300, format="pdf")
     plt.savefig(filename[:-4] + ftail+"."+Format, dpi=100,
+                format=Format, bbox_inches='tight',transparent=False)
+    plt.close()
+
+    #plot the tilt distribution based on only one configuration
+    plt.figure()
+    plt.hist(deg,bins=50,histtype="step",density=True,label="hist")
+    theta=np.linspace(0,0.5*np.pi,100)
+    plt.plot(theta,np.sin(theta),label=r"$\sin(\theta)$")
+    plt.xlabel(r"$\theta$")
+    plt.ylabel("count")
+    plt.legend()
+    plt.title(filename[-17:-12])
+    plt.savefig(filename[:-4]+"tilt_hist."+Format, dpi=100,
                 format=Format, bbox_inches='tight',transparent=False)
     plt.close()
 

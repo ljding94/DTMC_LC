@@ -2,5 +2,6 @@
 !code
 !pycode
 !analyze
+!plot
 !README.md
 !.gitignore
